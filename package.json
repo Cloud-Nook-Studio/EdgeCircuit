@@ -9,20 +9,37 @@
     "npm": ">=11.0.0"
   },
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/web"
   ],
   "scripts": {
     "dev:web": "npm run dev --workspace @brain-training/web",
     "dev:mobile": "npm run start --workspace @brain-training/mobile",
+    "dev:site": "next dev",
     "generate:audio": "node scripts/generate-ui-tones.mjs",
     "build:mobile": "npm run export:android --workspace @brain-training/mobile",
-    "test": "npm run test --workspace @brain-training/shared",
+    "test": "vitest run packages/shared/src",
     "test:e2e": "npm run test:e2e --workspace @brain-training/web",
     "test:e2e:phone": "npm run test:e2e:phone --workspace @brain-training/web",
-    "typecheck": "npm run typecheck --workspace @brain-training/shared && npm run typecheck --workspace @brain-training/web",
+    "typecheck": "tsc -p packages/shared/tsconfig.json --noEmit && npm run typecheck --workspace @brain-training/web",
     "typecheck:all": "npm run typecheck --workspaces --if-present",
-    "build": "npm run build --workspace @brain-training/shared && npm run build --workspace @brain-training/web",
-    "check": "npm run test && npm run typecheck && npm run build"
+    "build:web": "tsc -p packages/shared/tsconfig.json && npm run build --workspace @brain-training/web",
+    "build": "next build",
+    "check": "npm run test && npm run typecheck && npm run build:web && npm run build"
+  },
+  "dependencies": {
+    "next": "16.2.12",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "postcss": "8.5.23",
+    "sharp": "0.35.3"
   }
 }

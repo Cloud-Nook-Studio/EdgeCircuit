@@ -41,6 +41,10 @@ being presented as ability.
   adaptation, session state, timing, summaries, and persistence validation.
 - Root npm workspaces: one lockfile and familiar commands with no task runner
   until build time demonstrates a need for one.
+- Managed production hosting uses a thin root Next.js wrapper around the
+  desktop web client. The interactive source remains in `apps/web`; the wrapper
+  supplies a supported public-registry build surface without installing or
+  building the parked native-mobile workspace.
 
 React Native recommends using a framework for new native apps, and Expo is the
 framework selected here. Keeping the web client separate allows normal web
