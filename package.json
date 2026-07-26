@@ -20,7 +20,7 @@
     "typecheck": "tsc -p packages/shared/tsconfig.json --noEmit && npm --prefix apps/web run typecheck",
     "typecheck:all": "npm run typecheck",
     "build:web": "tsc -p packages/shared/tsconfig.json && npm --prefix apps/web run build",
-    "build": "next build",
+    "build": "next build && node scripts/prepare-site-dist.mjs",
     "check": "npm run test && npm run typecheck && npm run build:web && npm run build"
   },
   "dependencies": {

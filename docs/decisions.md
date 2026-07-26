@@ -44,7 +44,8 @@ being presented as ability.
 - Managed production hosting uses a thin root Next.js wrapper around the
   desktop web client. The interactive source remains in `apps/web`; the wrapper
   supplies a supported public-registry build surface without installing or
-  building the parked native-mobile workspace.
+  building the parked native-mobile workspace. Its static export is copied to
+  the host-standard `dist` artifact directory after a successful build.
 
 React Native recommends using a framework for new native apps, and Expo is the
 framework selected here. Keeping the web client separate allows normal web
