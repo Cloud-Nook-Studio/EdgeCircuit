@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Cognivate",
+    "slug": "pulse-path",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jonathanbate.pulsepath"
+    },
+    "android": {
+      "package": "com.jonathanbate.pulsepath"
+    },
+    "plugins": [
+      "expo-audio"
+    ]
+  }
+}
