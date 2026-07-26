@@ -8,21 +8,18 @@
     "node": ">=22.13.0",
     "npm": ">=11.0.0"
   },
-  "workspaces": [
-    "apps/web"
-  ],
   "scripts": {
-    "dev:web": "npm run dev --workspace @brain-training/web",
-    "dev:mobile": "npm run start --workspace @brain-training/mobile",
+    "dev:web": "npm --prefix apps/web run dev",
+    "dev:mobile": "npm --prefix apps/mobile run start",
     "dev:site": "next dev",
     "generate:audio": "node scripts/generate-ui-tones.mjs",
-    "build:mobile": "npm run export:android --workspace @brain-training/mobile",
+    "build:mobile": "npm --prefix apps/mobile run export:android",
     "test": "vitest run packages/shared/src",
-    "test:e2e": "npm run test:e2e --workspace @brain-training/web",
-    "test:e2e:phone": "npm run test:e2e:phone --workspace @brain-training/web",
-    "typecheck": "tsc -p packages/shared/tsconfig.json --noEmit && npm run typecheck --workspace @brain-training/web",
-    "typecheck:all": "npm run typecheck --workspaces --if-present",
-    "build:web": "tsc -p packages/shared/tsconfig.json && npm run build --workspace @brain-training/web",
+    "test:e2e": "npm --prefix apps/web run test:e2e",
+    "test:e2e:phone": "npm --prefix apps/web run test:e2e:phone",
+    "typecheck": "tsc -p packages/shared/tsconfig.json --noEmit && npm --prefix apps/web run typecheck",
+    "typecheck:all": "npm run typecheck",
+    "build:web": "tsc -p packages/shared/tsconfig.json && npm --prefix apps/web run build",
     "build": "next build",
     "check": "npm run test && npm run typecheck && npm run build:web && npm run build"
   },
@@ -32,10 +29,13 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
     "typescript": "~5.9.3",
+    "vite": "^8.1.5",
     "vitest": "^4.1.10"
   },
   "overrides": {
