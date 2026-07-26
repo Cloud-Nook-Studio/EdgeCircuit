@@ -20,13 +20,13 @@
     "typecheck": "tsc -p packages/shared/tsconfig.json --noEmit && npm --prefix apps/web run typecheck",
     "typecheck:all": "npm run typecheck",
     "build:web": "tsc -p packages/shared/tsconfig.json && npm --prefix apps/web run build",
-    "build": "next build && node scripts/prepare-site-dist.mjs",
+    "build": "vinext build && node scripts/prepare-site-dist.mjs",
     "check": "npm run test && npm run typecheck && npm run build:web && npm run build"
   },
   "dependencies": {
     "next": "16.2.12",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.0",
@@ -34,8 +34,10 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "@vitejs/plugin-rsc": "^0.5.30",
     "typescript": "~5.9.3",
     "vite": "^8.1.5",
+    "vinext": "1.0.0-beta.4",
     "vitest": "^4.1.10"
   },
   "overrides": {
