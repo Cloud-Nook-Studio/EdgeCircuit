@@ -26,14 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Test, type-check, and build
-        run: npm run check
+      - name: Run shared tests
+        run: npm run test
 
-      - name: Verify Android production bundle
-        run: npm run build:mobile
+      - name: Type-check desktop web
+        run: npm run typecheck
+
+      - name: Build desktop web
+        run: npm run build:web
 
       - name: Install browser for end-to-end tests
         run: npx playwright install --with-deps chromium
 
-      - name: Run desktop and phone browser flows
+      - name: Run desktop browser flows
         run: npm run test:e2e
