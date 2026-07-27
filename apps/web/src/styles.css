@@ -12797,8 +12797,8 @@ html[data-contrast="high"] .vector-match-shape-index {
   opacity: 1;
 }
 
-.circuit-reserve .game-node-drift,
-.circuit-reserve .game-choice:hover .game-node-drift {
+.game-library .circuit-reserve .game-node-drift,
+.game-library .circuit-reserve .game-choice:hover .game-node-drift {
   position: relative;
   display: block;
   width: 100%;
@@ -16230,8 +16230,8 @@ html[data-theme="light"] .game-library .game-choice.is-complete .game-node-drift
   --reserve-float-duration: 9.4s;
 }
 
-.circuit-reserve .game-node-drift,
-.circuit-reserve .game-choice:hover .game-node-drift {
+.game-library .circuit-reserve .game-node-drift,
+.game-library .circuit-reserve .game-choice:hover .game-node-drift {
   animation: reserve-game-float var(--reserve-float-duration) ease-in-out
     var(--reserve-float-delay) infinite;
   transform-origin: 50% 50%;
