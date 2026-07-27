@@ -70,10 +70,26 @@ export function useGameAudio(enabled: boolean) {
   }, []);
 
   const unlock = useCallback(() => {
-    void ensureRunning().then((context) => {
-      if (context) primeOutput(context);
-    });
-  }, [ensureRunning, primeOutput]);
+    const context = getContext();
+    if (!context || context.state === "closed") return;
+
+    /*
+     * iOS requires both node creation and playback scheduling to happen
+     * directly inside the user's gesture. Prime before awaiting resume so
+     * Safari cannot discard the activation between promise turns.
+     */
+    try {
+      primeOutput(context);
+    } catch {
+      /*
+       * A restricted browser may expose AudioContext without permitting a
+       * buffer source. Resuming still gives the normal cue path a chance.
+       */
+    }
+    if (context.state !== "running") {
+      void context.resume().catch(() => undefined);
+    }
+  }, [getContext, primeOutput]);
 
   const playTone = useCallback(
     ({ duration, frequencies, volume }: ToneOptions, force = false) => {
@@ -176,7 +192,7 @@ export function useGameAudio(enabled: boolean) {
       playTone({
         duration: 0.12,
         frequencies: [root, root * 1.5],
-        volume: 0.075,
+        volume: 0.14,
       });
     },
     [playTone],
@@ -276,7 +292,7 @@ export function useGameAudio(enabled: boolean) {
     playTone({
       duration: 0.2,
       frequencies: [440, 659],
-      volume: 0.085,
+      volume: 0.14,
     });
   }, [playTone]);
 
