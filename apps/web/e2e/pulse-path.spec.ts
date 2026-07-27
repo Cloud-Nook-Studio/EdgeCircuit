@@ -189,7 +189,11 @@ test("Daily Circuit hub initiates and advances the saved game sequence", async (
 
 test("home screen fits its viewport and exposes theme and sound preferences", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "The phone home screen has its own compact visual contract.",
+  );
   await expect(
     page.getByRole("heading", { name: "Sharpen your edge." }),
   ).toHaveCount(0);
@@ -636,9 +640,85 @@ test("home screen fits its viewport and exposes theme and sound preferences", as
   ).toHaveAttribute("aria-pressed", "false");
 });
 
+test("phone home keeps the full circuit and controls inside the viewport", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "phone",
+    "This is the phone home-screen visual contract.",
+  );
+
+  await expectNoHorizontalOverflow(page);
+  await expect(page.getByRole("button", { name: "Theme" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sound" })).toBeVisible();
+  await expect(page.locator(".orbit-game-selector [data-game-id]")).toHaveCount(
+    7,
+  );
+
+  const layout = await page.evaluate(() => {
+    const viewportWidth = window.innerWidth;
+    const headerControls = [
+      ...document.querySelectorAll<HTMLElement>(
+        ".site-header .brand, .site-header .practice-charge, .site-header .utility-button",
+      ),
+    ].map((element) => {
+      const bounds = element.getBoundingClientRect();
+      return { left: bounds.left, right: bounds.right, top: bounds.top };
+    });
+    const nodes = [
+      ...document.querySelectorAll<HTMLElement>(
+        ".orbit-game-selector > .game-choice",
+      ),
+    ].map((element) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        bottom: bounds.bottom,
+        game: element.dataset.gameId,
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+      };
+    });
+    return { headerControls, nodes, viewportWidth };
+  });
+
+  for (const control of layout.headerControls) {
+    expect(control.left).toBeGreaterThanOrEqual(0);
+    expect(control.right).toBeLessThanOrEqual(layout.viewportWidth);
+    expect(control.top).toBeGreaterThanOrEqual(0);
+  }
+  for (let first = 0; first < layout.nodes.length; first += 1) {
+    for (let second = first + 1; second < layout.nodes.length; second += 1) {
+      const horizontalOverlap =
+        Math.min(layout.nodes[first]!.right, layout.nodes[second]!.right) -
+        Math.max(layout.nodes[first]!.left, layout.nodes[second]!.left);
+      const verticalOverlap =
+        Math.min(layout.nodes[first]!.bottom, layout.nodes[second]!.bottom) -
+        Math.max(layout.nodes[first]!.top, layout.nodes[second]!.top);
+      expect(
+        horizontalOverlap <= 2 || verticalOverlap <= 2,
+        `${layout.nodes[first]!.game} and ${layout.nodes[second]!.game} overlap`,
+      ).toBe(true);
+    }
+  }
+
+  const placementBounds = await page
+    .getByRole("button", {
+      name: "Remove Digit Hold from daily circuit",
+    })
+    .boundingBox();
+  expect(placementBounds).not.toBeNull();
+  expect(placementBounds!.width).toBeGreaterThanOrEqual(29);
+  expect(placementBounds!.height).toBeGreaterThanOrEqual(27);
+});
+
 test("hover keeps home game text registered inside its blueprint node", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "Hover registration is a desktop interaction.",
+  );
   await page.goto("/");
   const signalNode = page.locator(".game-choice-signal");
   const copy = signalNode.locator(".orbit-game-copy");
@@ -669,7 +749,11 @@ test("hover keeps home game text registered inside its blueprint node", async ({
 
 test("daily diagnostics form a compact instrument around the circuit hub", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "Desktop diagnostic dimensions differ from the phone orbit.",
+  );
   await page.evaluate(() => {
     const now = new Date();
     const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
@@ -749,7 +833,11 @@ test("daily diagnostics form a compact instrument around the circuit hub", async
 
 test("compact browser panes keep completed game nodes separate", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "This test resizes the desktop visual contract.",
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(() => {
     const now = new Date();
@@ -777,8 +865,8 @@ test("compact browser panes keep completed game nodes separate", async ({
 
   const nodes = page.locator(".orbit-game-selector .game-choice");
   await expect(nodes).toHaveCount(7);
-  await expect(nodes.first()).toHaveCSS("width", "128px");
-  await expect(nodes.first()).toHaveCSS("height", "96px");
+  await expect(nodes.first()).toHaveCSS("width", "104px");
+  await expect(nodes.first()).toHaveCSS("height", "78px");
 
   const bounds = await nodes.evaluateAll((elements) =>
     elements.map((element) => {
@@ -1114,7 +1202,11 @@ test("exiting Digit Hold discards the active session without a save flow", async
 
 test("games can be dragged off and back onto the Daily Circuit with persistence", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "Phone drag persistence is covered with real touch input.",
+  );
   const circuit = page.getByRole("region", { name: "Daily circuit" });
   const reserve = page.getByRole("region", { name: "Available games" });
   const digitGame = circuit.locator('[data-game-id="number-memory"]');
@@ -1284,9 +1376,115 @@ test("games can be dragged off and back onto the Daily Circuit with persistence"
   ).toHaveCount(7);
 });
 
+test("phone touch dragging moves a game off the circuit", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "phone",
+    "This regression covers the phone touch path.",
+  );
+
+  const source = page
+    .getByRole("region", { name: "Daily circuit" })
+    .locator('[data-game-id="number-memory"]');
+  const reserve = page.getByRole("region", { name: "Available games" });
+  const sourceBounds = await source.boundingBox();
+  const reserveBounds = await reserve.boundingBox();
+  expect(sourceBounds).not.toBeNull();
+  expect(reserveBounds).not.toBeNull();
+
+  const start = {
+    x: sourceBounds!.x + sourceBounds!.width / 2,
+    y: sourceBounds!.y + sourceBounds!.height / 2,
+  };
+  const end = {
+    x: reserveBounds!.x + reserveBounds!.width / 2,
+    y: reserveBounds!.y + reserveBounds!.height / 2,
+  };
+  const client = await page.context().newCDPSession(page);
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [start],
+  });
+  for (let step = 1; step <= 12; step += 1) {
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        {
+          x: start.x + ((end.x - start.x) * step) / 12,
+          y: start.y + ((end.y - start.y) * step) / 12,
+        },
+      ],
+    });
+  }
+  await expect(page.locator(".circuit-drag-ghost")).toBeVisible();
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+
+  await expect(
+    reserve.locator('[data-game-id="number-memory"]'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Add Digit Hold to daily circuit",
+    }),
+  ).toBeVisible();
+
+  const floatingBounds = await reserve
+    .locator('[data-game-id="number-memory"]')
+    .boundingBox();
+  const circuitBounds = await page
+    .getByRole("region", { name: "Daily circuit" })
+    .boundingBox();
+  expect(floatingBounds).not.toBeNull();
+  expect(circuitBounds).not.toBeNull();
+  const returnStart = {
+    x: floatingBounds!.x + floatingBounds!.width / 2,
+    y: floatingBounds!.y + floatingBounds!.height / 2,
+  };
+  const returnEnd = {
+    x: circuitBounds!.x + circuitBounds!.width * 0.82,
+    y: circuitBounds!.y + circuitBounds!.height * 0.5,
+  };
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [returnStart],
+  });
+  for (let step = 1; step <= 12; step += 1) {
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        {
+          x:
+            returnStart.x +
+            ((returnEnd.x - returnStart.x) * step) / 12,
+          y:
+            returnStart.y +
+            ((returnEnd.y - returnStart.y) * step) / 12,
+        },
+      ],
+    });
+  }
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+  await expect(
+    page
+      .getByRole("region", { name: "Daily circuit" })
+      .locator('[data-game-id="number-memory"]'),
+  ).toBeVisible();
+});
+
 test("the broad circuit band accepts flexible drops and keeps neighboring nodes clear", async ({
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === "phone",
+    "This exercises the desktop circuit geometry.",
+  );
   const circuit = page.getByRole("region", { name: "Daily circuit" });
   const pulsePath = circuit.locator('[data-game-id="pulse-path"]');
 
@@ -2528,6 +2726,82 @@ test("number memory completes three rounds at the selected digit span", async ({
     "7 games · 3/21 rounds",
   );
   await expectNoHorizontalOverflow(page);
+});
+
+test("Digit Hold primes and retains numeric input focus on a phone", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "phone",
+    "Soft-keyboard focus is a phone-web behavior.",
+  );
+  await page.clock.install();
+  await openOrbitGame(page, /Number memory Digit Hold/i);
+  await page.getByRole("button", { name: /Start 3 rounds/i }).click();
+
+  await expect(page.getByLabel("Digit keypad ready")).toBeFocused();
+  await page.clock.runFor(1_800);
+  await expect(
+    page.getByLabel("Enter the digits in the same order"),
+  ).toBeFocused();
+});
+
+test("enabling sound produces an audible game cue", async ({ page }) => {
+  await page.addInitScript(() => {
+    const audioContext =
+      window.AudioContext ??
+      (
+        window as typeof window & {
+          webkitAudioContext?: typeof AudioContext;
+        }
+      ).webkitAudioContext;
+    if (!audioContext) return;
+
+    (
+      window as typeof window & {
+        __edgeCircuitOscillatorStarts?: number;
+      }
+    ).__edgeCircuitOscillatorStarts = 0;
+    const originalCreateOscillator =
+      audioContext.prototype.createOscillator;
+    audioContext.prototype.createOscillator = function createOscillator() {
+      const oscillator = originalCreateOscillator.call(this);
+      const originalStart = oscillator.start.bind(oscillator);
+      oscillator.start = (...args: Parameters<OscillatorNode["start"]>) => {
+        (
+          window as typeof window & {
+            __edgeCircuitOscillatorStarts?: number;
+          }
+        ).__edgeCircuitOscillatorStarts =
+          ((
+            window as typeof window & {
+              __edgeCircuitOscillatorStarts?: number;
+            }
+          ).__edgeCircuitOscillatorStarts ?? 0) + 1;
+        return originalStart(...args);
+      };
+      return oscillator;
+    };
+  });
+  await page.reload();
+
+  const sound = page.getByRole("button", { name: "Sound" });
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "false");
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "true");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as typeof window & {
+              __edgeCircuitOscillatorStarts?: number;
+            }
+          ).__edgeCircuitOscillatorStarts ?? 0,
+      ),
+    )
+    .toBeGreaterThan(0);
 });
 
 test("number memory shows an inline miss without replacing recall", async ({

@@ -68,7 +68,7 @@ function IdentityPortrait({
       aria-hidden={label ? undefined : true}
     >
       <img
-        src="/assets/name-recall-faces.png"
+        src={`${import.meta.env.BASE_URL}assets/name-recall-faces.png`}
         alt=""
         draggable={false}
         style={portraitStyle}

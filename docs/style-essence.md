@@ -396,6 +396,14 @@ The user should feel:
 3. respected rather than manipulated;
 4. ready to return tomorrow.
 
+Responsive mobile web keeps the same instrument character with a purpose-built
+compact orbit, not a scaled-down desktop canvas. Header instruments must all
+remain visible, touch dragging must use pointer capture, add/remove controls
+stay exposed, and identity artwork may never crop beyond its intended frame.
+Digit Hold primes its numeric input from the session-start gesture so a phone
+keyboard is ready when recall begins. This does not reactivate the separate
+native mobile client.
+
 ## Never drift toward
 
 - Phone-pad grids or numbered tiles.

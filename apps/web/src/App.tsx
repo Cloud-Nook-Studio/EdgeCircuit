@@ -2786,6 +2786,7 @@ function OrbitGameNode({
     grabOffsetX: number;
     grabOffsetY: number;
     height: number;
+    element: HTMLElement;
     width: number;
   } | null>(null);
   const placementStyle = {
@@ -2813,6 +2814,7 @@ function OrbitGameNode({
     ) {
       current.active = true;
       suppressLaunch.current = true;
+      current.element.setPointerCapture(event.pointerId);
       onPointerDragStart({
         game,
         grabOffsetX: current.grabOffsetX,
@@ -2836,6 +2838,9 @@ function OrbitGameNode({
 
     clearPointerListeners();
     pointerDrag.current = null;
+    if (current.element.hasPointerCapture(event.pointerId)) {
+      current.element.releasePointerCapture(event.pointerId);
+    }
     if (!current.active) return;
 
     event.preventDefault();
@@ -2852,13 +2857,17 @@ function OrbitGameNode({
 
     clearPointerListeners();
     pointerDrag.current = null;
+    if (current.element.hasPointerCapture(event.pointerId)) {
+      current.element.releasePointerCapture(event.pointerId);
+    }
     if (current.active) onPointerDragCancel();
     suppressLaunch.current = false;
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLElement>) {
     if (
-      event.button !== 0 ||
+      !event.isPrimary ||
+      (event.pointerType === "mouse" && event.button !== 0) ||
       (event.target as Element).closest(".game-node-placement")
     ) {
       return;
@@ -2868,6 +2877,7 @@ function OrbitGameNode({
     const bounds = event.currentTarget.getBoundingClientRect();
     pointerDrag.current = {
       active: false,
+      element: event.currentTarget,
       grabOffsetX: event.clientX - bounds.left,
       grabOffsetY: event.clientY - bounds.top,
       height: bounds.height,
@@ -2937,6 +2947,7 @@ function OrbitGameNode({
         aria-label={`${
           inCircuit ? "Remove" : "Add"
         } ${name} ${inCircuit ? "from" : "to"} daily circuit`}
+        onPointerDown={(event) => event.stopPropagation()}
         onClick={onTogglePlacement}
       >
         <span aria-hidden="true">{inCircuit ? "−" : "+"}</span>
@@ -3282,8 +3293,9 @@ function Home({
       (y - (circuitBounds.top + circuitBounds.height / 2)) /
       (circuitBounds.height * 0.39);
     const distanceFromRoute = Math.hypot(xFromCenter, yFromCenter);
+    const outerRouteEdge = window.innerWidth <= 720 ? 1.05 : 1.32;
 
-    return distanceFromRoute >= 0.3 && distanceFromRoute <= 1.32
+    return distanceFromRoute >= 0.3 && distanceFromRoute <= outerRouteEdge
       ? "circuit"
       : "reserve";
   }

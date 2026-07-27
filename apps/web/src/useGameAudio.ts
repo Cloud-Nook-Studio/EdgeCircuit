@@ -59,9 +59,21 @@ export function useGameAudio(enabled: boolean) {
     return context.state === "running" ? context : null;
   }, [getContext]);
 
+  const primeOutput = useCallback((context: AudioContext) => {
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    source.buffer = context.createBuffer(1, 1, context.sampleRate);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    source.connect(gain);
+    gain.connect(context.destination);
+    source.start();
+  }, []);
+
   const unlock = useCallback(() => {
-    void ensureRunning();
-  }, [ensureRunning]);
+    void ensureRunning().then((context) => {
+      if (context) primeOutput(context);
+    });
+  }, [ensureRunning, primeOutput]);
 
   const playTone = useCallback(
     ({ duration, frequencies, volume }: ToneOptions, force = false) => {
@@ -164,7 +176,7 @@ export function useGameAudio(enabled: boolean) {
       playTone({
         duration: 0.12,
         frequencies: [root, root * 1.5],
-        volume: 0.055,
+        volume: 0.075,
       });
     },
     [playTone],
@@ -264,13 +276,38 @@ export function useGameAudio(enabled: boolean) {
     playTone({
       duration: 0.2,
       frequencies: [440, 659],
-      volume: 0.065,
+      volume: 0.085,
     });
   }, [playTone]);
 
   const playPreview = useCallback(() => {
     playResultEffect(true, true);
   }, [playResultEffect]);
+
+  useEffect(
+    () => {
+      if (!enabled) return;
+
+      const resumeFromGesture = () => unlock();
+      document.addEventListener("pointerdown", resumeFromGesture, {
+        capture: true,
+        passive: true,
+      });
+      document.addEventListener("keydown", resumeFromGesture, {
+        capture: true,
+      });
+
+      return () => {
+        document.removeEventListener("pointerdown", resumeFromGesture, {
+          capture: true,
+        });
+        document.removeEventListener("keydown", resumeFromGesture, {
+          capture: true,
+        });
+      };
+    },
+    [enabled, unlock],
+  );
 
   useEffect(
     () => () => {

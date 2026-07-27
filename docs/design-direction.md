@@ -362,6 +362,9 @@ game. Keyboard users receive the same add/remove outcome through an explicit
 card control, without needing to emulate pointer movement. The surrounding
 off-circuit field remains quiet at rest but never appears disabled.
 
-These home-screen rules govern the current desktop-web prototype. Preserve them
-as future design guidance, but do not implement or validate a mobile version
-while mobile work remains parked.
+These home-screen rules govern both desktop and responsive mobile web. On a
+phone, use a dedicated compact orbital path rather than squeezing the desktop
+coordinates into the viewport. Keep all seven game nodes legible, preserve the
+central launch instrument, expose at least 38 CSS-pixel preference controls and
+generous card hit areas, and make the card-level add/remove control permanently
+visible. Native `apps/mobile/` work remains parked until explicitly reactivated.

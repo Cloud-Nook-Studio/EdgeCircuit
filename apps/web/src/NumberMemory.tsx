@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   NUMBER_MEMORY_DEFAULT_LENGTH,
   NUMBER_MEMORY_EXPOSURE_MS,
@@ -62,6 +63,7 @@ export function NumberMemory({
   const inputRef = useRef<HTMLInputElement>(null);
   const recallStartedAt = useRef<number | null>(null);
   const submissionLocked = useRef(false);
+  const completionReported = useRef(false);
 
   const number = useMemo(
     () => generateNumberMemoryValue(seed, roundIndex, digitLength),
@@ -90,7 +92,15 @@ export function NumberMemory({
     const retentionTimer = window.setTimeout(() => {
       recallStartedAt.current = performance.now();
       setPhase("recall");
-      window.setTimeout(() => inputRef.current?.focus(), 30);
+      window.setTimeout(() => {
+        inputRef.current?.focus({ preventScroll: true });
+        const virtualKeyboard = (
+          navigator as Navigator & {
+            virtualKeyboard?: { show?: () => void };
+          }
+        ).virtualKeyboard;
+        virtualKeyboard?.show?.();
+      }, 30);
     }, NUMBER_MEMORY_RETENTION_MS);
 
     return () => window.clearTimeout(retentionTimer);
@@ -107,7 +117,10 @@ export function NumberMemory({
 
     const timer = window.setTimeout(() => {
       if (roundIndex === TOTAL_ROUNDS - 1) {
-        onComplete();
+        if (!completionReported.current) {
+          completionReported.current = true;
+          onComplete();
+        }
         setPhase("summary");
         return;
       }
@@ -162,12 +175,17 @@ export function NumberMemory({
   }
 
   function startSession() {
-    setSeed(createSeed());
-    setRoundIndex(0);
-    setPhase("show");
-    setResponse("");
-    setRounds([]);
-    recallStartedAt.current = null;
+    flushSync(() => {
+      setSeed(createSeed());
+      setRoundIndex(0);
+      setPhase("show");
+      setResponse("");
+      setRounds([]);
+      recallStartedAt.current = null;
+      completionReported.current = false;
+      submissionLocked.current = false;
+    });
+    inputRef.current?.focus({ preventScroll: true });
   }
 
   function openSetup() {
@@ -176,6 +194,8 @@ export function NumberMemory({
     setResponse("");
     setRounds([]);
     recallStartedAt.current = null;
+    completionReported.current = false;
+    submissionLocked.current = false;
   }
 
   function adjustDigitLength(delta: number) {
@@ -401,52 +421,61 @@ export function NumberMemory({
           </div>
         )}
 
-        {(phase === "recall" || phase === "feedback") && (
-          <form
-            className="number-recall-form"
-            onSubmit={(event) => event.preventDefault()}
-          >
-            <label htmlFor="number-response">
-              Enter the digits in the same order
-            </label>
-            <input
-              ref={inputRef}
-              id="number-response"
-              type="text"
-              inputMode="numeric"
-              autoComplete="off"
-              pattern="[0-9]*"
-              maxLength={length}
-              disabled={phase === "feedback"}
-              value={response}
-              onChange={(event) => {
-                const nextResponse = event.target.value
-                  .replace(/\D/g, "")
-                  .slice(0, length);
-                setResponse(nextResponse);
-                if (nextResponse.length === length) {
-                  commitResponse(nextResponse);
-                }
-              }}
-              placeholder={Array.from({ length }, () => "•").join("")}
-            />
-            <span className="digit-count">
-              {response.length} / {length} digits
-            </span>
-            {phase === "feedback" && currentResult && !currentResult.exact && (
-              <div
-                className="inline-recall-feedback is-miss"
-                role="status"
-                aria-label="Not quite"
-              >
-                <span className="inline-feedback-mark" aria-hidden="true">
-                  ×
-                </span>
-                <strong>Not quite</strong>
-              </div>
-            )}
-          </form>
-        )}
+        <form
+          className={`number-recall-form ${
+            phase === "show" || phase === "retention"
+              ? "is-keyboard-primed"
+              : ""
+          }`}
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <label htmlFor="number-response">
+            {phase === "recall" || phase === "feedback"
+              ? "Enter the digits in the same order"
+              : "Digit keypad ready"}
+          </label>
+          <input
+            ref={inputRef}
+            id="number-response"
+            type="text"
+            inputMode="numeric"
+            enterKeyHint="done"
+            autoComplete="off"
+            pattern="[0-9]*"
+            maxLength={length}
+            value={response}
+            onChange={(event) => {
+              if (phase !== "recall") return;
+              const nextResponse = event.target.value
+                .replace(/\D/g, "")
+                .slice(0, length);
+              setResponse(nextResponse);
+              if (nextResponse.length === length) {
+                commitResponse(nextResponse);
+              }
+            }}
+            placeholder={Array.from({ length }, () => "•").join("")}
+          />
+          {(phase === "recall" || phase === "feedback") && (
+            <>
+              <span className="digit-count">
+                {response.length} / {length} digits
+              </span>
+              {phase === "feedback" && currentResult && !currentResult.exact && (
+                <div
+                  className="inline-recall-feedback is-miss"
+                  role="status"
+                  aria-label="Not quite"
+                >
+                  <span className="inline-feedback-mark" aria-hidden="true">
+                    ×
+                  </span>
+                  <strong>Not quite</strong>
+                </div>
+              )}
+            </>
+          )}
+        </form>
 
         {phase === "feedback" && currentResult?.exact && (
           <div
