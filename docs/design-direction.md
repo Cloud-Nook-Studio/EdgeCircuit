@@ -198,14 +198,17 @@ route.
   cue and the selected number of candidates. Exactly one candidate matches the
   cue's contour, orientation, and index mark; controlled near-matches differ on
   one or more of those dimensions. One selection resolves the round.
-- **Vector Match** runs for three rounds. Each round shows an asymmetric
+- **Vector Match** runs for three rounds. Its setup offers five rotation bands
+  and defaults to the middle one; a higher band places a wider angle between the
+  two figures, which is harder to resolve. Each round shows an asymmetric
   blueprint figure beside a transformed comparison. The player classifies the
   comparison as the same figure under rotation or as a mirror reflection.
   Displaced contours, construction lines, and index marks make the distinction
   legible without turning the task into decorative shape matching.
-- **Trace Pair** runs for three rounds. Each round presents six free blueprint
-  assemblies around a loose circular constellation, joined by quiet radial
-  spokes to one central junction. Exactly one pair has the same internal
+- **Trace Pair** runs for three rounds. Its setup offers four, six, or eight
+  candidate assemblies and defaults to six. Each round presents that many free
+  blueprint assemblies around a loose circular constellation, joined by quiet
+  radial spokes to one central junction. Exactly one pair has the same internal
   connection topology. A correct pair lights its two spokes in muted green
   with restrained gold detail. Shell, datum position, and rotation vary
   independently. Selection is direct; never turn it into a face-down card grid
@@ -213,10 +216,11 @@ route.
   visible assembly a small independent zero-gravity drift while the surrounding
   button remains stationary; vary phase, axis, duration, and sub-degree rotation
   so motion never changes the answer geometry or weakens target acquisition.
-- **Name Recall** runs for three rounds. Each round shows three unique,
-  recognizably human professional portraits paired with first names for 4.5 seconds, clears them for
-  a 650-millisecond retention beat, then returns one identity with the same
-  three names as choices. Use the exact same three face-to-name contacts
+- **Name Recall** runs for three rounds. Its setup offers three, four, or five
+  people and defaults to three. Each round shows that many unique, recognizably
+  human professional portraits paired with first names for 4.5 seconds, clears
+  them for a 650-millisecond retention beat, then returns one identity with the
+  same names as choices. Use the exact same three face-to-name contacts
   throughout one complete three-round iteration. Change only the recalled
   target and answer order between rounds; each person becomes the target once.
   Pair names from the matching masculine or feminine pool for each portrait;
@@ -231,13 +235,23 @@ route.
 
 ## Color
 
-- Background: near-black navy.
+- Background: near-black navy in dark, warm paper in light. The light field is
+  warm rather than cool grey so restrained gold reads as gold against it.
 - Primary silhouettes: muted mineral blue-gray.
 - Active signal: restrained deep gold.
 - Correct resolution: muted mineral green.
 - Secondary lines: desaturated steel blue at low opacity.
 - Never use a rainbow palette to distinguish targets; silhouette and position
   carry identity.
+- Saturated colour such as `#ffcb05` belongs only inside
+  `[data-contrast="high"]`, which deliberately trades the aesthetic for WCAG
+  contrast. Aesthetic rules scope themselves away from that mode with
+  `:not([data-contrast="high"])` and must leave its solid fills and hard borders
+  intact.
+- The four cardinal diagnostics keep their specified widths (about 56px, and
+  62px for Pace) but need an opaque plate. A translucent fill lets the circuit
+  traces show through the empty half of a box that is still displaying an em
+  dash, which makes a deliberate annotation read as a half-drawn frame.
 
 ## Motion
 
@@ -296,10 +310,57 @@ route.
 
 ## Typography and layout
 
-- Editorial serif for major moments and summaries.
-- Compact sans serif for controls, metrics, and instruction.
+- **Newsreader** (variable, 400–600, SIL OFL 1.1) for major moments and
+  summaries: screen headlines, game node titles, and the hub's `Initiate`
+  label. It sets a lighter colour than a web-safe serif at the same nominal
+  weight and sharpens under negative tracking, so serif slots run at weight 500
+  to 600 with tracking no tighter than about −0.02em.
+- **Inter** (variable, 400–700, SIL OFL 1.1) for controls, metrics,
+  instruction, and eyebrows. Metric readouts add `font-variant-numeric:
+  tabular-nums` so figures hold their column as values change.
 - Monospace only for recalled digit strings.
+- Both families live in `apps/web/src/fonts/` and are declared with
+  `@font-face` at the head of `styles.css` using relative `url()` paths, so
+  Vite fingerprints them and rewrites the URLs against `VITE_BASE_PATH`. Latin
+  and Latin-Extended are split by `unicode-range`; the extended subset is only
+  fetched when a page actually needs it. Serve no font from a third-party
+  origin.
+- Declare families only through `--font-serif`, `--font-sans`, and
+  `--font-mono`.
 - Short copy, decisive labels, and one primary action per screen.
+- Colour tokens must describe their own value. `--mineral`, `--gold`, and
+  `--steel` name the mineral blue, restrained gold, and steel blue they hold;
+  the palette previously shipped `--green` bound to a blue and `--lime` and
+  `--coral` both bound to golds, which quietly misled every later edit.
+
+## Exercise screens
+
+- An exercise renders on the field, not in a panel. `.game-card`,
+  `.number-card`, and `.summary-card` carry no border, radius, background, or
+  shadow, and no minimum height reserving empty space.
+- The primary action keeps its gold — it is the dominant action — but takes an
+  8px corner bevel so it belongs to the faceted family rather than reading as a
+  saturated slab.
+- Setup steppers and the phase badge take the same bevel. The phase badge is a
+  faceted index with a rotated square datum, never a pill.
+- A bevelled element defines its silhouette with fill and carries no border:
+  `clip-path` clips the border too, so a stroked bevel arrives with open ends.
+  Elements that need a stroke keep square corners.
+- The round status row uses one baseline with `space-between` under a single
+  hairline rule, rather than three fragments at three unrelated positions.
+- Response pips are rotated squares, not keypad tiles.
+
+## Page composition
+
+- `.app-shell` is a flex column: `main` takes the free height and centres its
+  content with `justify-content: safe center`, and the claims note anchors to
+  the foot with `margin-top: auto`. `safe` matters — a viewport shorter than the
+  content must pin to the top rather than clipping the exit control off the
+  head of the screen.
+- The two header instruments share one height (42px), one bevel, and one fill.
+  Keep them at that height: the design direction calls for this row to sit about
+  a quarter shorter than the original instrument row, so match the smaller
+  module rather than growing to meet the larger one.
 
 ## UX standard
 

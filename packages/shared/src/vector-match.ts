@@ -9,6 +9,39 @@ import {
 export const VECTOR_MATCH_FEEDBACK_MS = 800 as const;
 export const VECTOR_MATCH_SHAPE_COUNT = 6 as const;
 
+/**
+ * Angular disparity level.
+ *
+ * Mental-rotation difficulty rises with the angle between the two figures, so
+ * the level selects the band the comparison is drawn from rather than adding
+ * more figures. Level 1 keeps the pair close to aligned; level 5 approaches
+ * the half-turn, where the comparison is hardest to resolve.
+ *
+ * Reported as performance on this task only — never as spatial intelligence.
+ */
+export const VECTOR_MATCH_MIN_LEVEL = 1 as const;
+export const VECTOR_MATCH_MAX_LEVEL = 5 as const;
+export const VECTOR_MATCH_DEFAULT_LEVEL = 3 as const;
+
+/** Inclusive disparity band per level, in multiples of 36 degrees. */
+const DISPARITY_BANDS: readonly (readonly [number, number])[] = [
+  [1, 2], // 36-72
+  [2, 3], // 72-108
+  [3, 4], // 108-144
+  [4, 5], // 144-180
+  [4, 6], // 144-216, straddling the half-turn
+];
+
+export function normalizeVectorMatchLevel(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return VECTOR_MATCH_DEFAULT_LEVEL;
+  }
+  return Math.min(
+    VECTOR_MATCH_MAX_LEVEL,
+    Math.max(VECTOR_MATCH_MIN_LEVEL, Math.round(value)),
+  );
+}
+
 export type VectorMatchChoice = "same" | "mirror";
 
 export interface VectorMatchTrial {
@@ -65,8 +98,10 @@ function assertTrial(trial: VectorMatchTrial): void {
 export function generateVectorMatchTrial(
   seed: Seed,
   roundIndex: number,
+  level: number = VECTOR_MATCH_DEFAULT_LEVEL,
 ): VectorMatchTrial {
   assertRoundIndex(roundIndex);
+  const band = DISPARITY_BANDS[normalizeVectorMatchLevel(level) - 1]!;
   const normalizedSeed = normalizeSeed(seed);
   const sessionRandom = createSeededRandom(
     hashSeed(`${normalizedSeed}:vector-match:answers:v1`),
@@ -76,7 +111,9 @@ export function generateVectorMatchTrial(
     hashSeed(`${normalizedSeed}:vector-match:${roundIndex}:v1`),
   );
   const referenceRotation = Math.floor(trialRandom() * 10) * 36;
-  const rotationOffset = (1 + Math.floor(trialRandom() * 9)) * 36;
+  const [minSteps, maxSteps] = band;
+  const rotationOffset =
+    (minSteps + Math.floor(trialRandom() * (maxSteps - minSteps + 1))) * 36;
 
   return {
     shapeIndex: Math.floor(trialRandom() * VECTOR_MATCH_SHAPE_COUNT),

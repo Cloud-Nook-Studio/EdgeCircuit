@@ -5,6 +5,7 @@ export * from "./difficulty";
 export * from "./name-recall";
 export * from "./number-memory";
 export * from "./persistence";
+export * from "./progress";
 export * from "./rule-shift";
 export * from "./scoring";
 export * from "./sequence";

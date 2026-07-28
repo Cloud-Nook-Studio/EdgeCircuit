@@ -393,11 +393,107 @@ seconds. A correct response just inside the window always earns at least one
 round-level pace point. Expiration never submits, fails, or closes a question:
 it changes the hourglass to a closed state and leaves the answer available.
 
+## ADR-018: Per-session progress record and between-session adaptation
+
+**Status:** Accepted — July 27, 2026
+
+Per-game history was one running mean per exercise, `{ accuracyTotal,
+sessions }`. That shape can report an average but never a trend, a best span,
+or a retention interval, because it carries no time dimension. The Pulse Path
+history list was also capped at six entries and only its most recent entry was
+ever rendered. The science brief positions the product as one that "shows how
+performance changes over time" and identifies task-level progress reporting as
+the competitive advantage, so the storage model was the binding constraint.
+
+`packages/shared/src/progress.ts` now keeps individual completed-session
+observations per game: timestamp, accuracy, level, exact rounds, and mean
+response time per item. Every readout is derived from those observations.
+Two rules govern it:
+
+- **Never fabricate an observation.** The previous running means are carried
+  forward as separate `legacySessions` and `legacyAccuracyTotal` counts, so a
+  returning player's play count and mean success are identical across the
+  upgrade, while trends accumulate only from real timestamped sessions. The
+  upgrade is written to the new key on first load so it is durable.
+- **Never report a trend from noise.** `summarizeProgress` withholds a
+  direction until two full windows of observations exist on either side of the
+  comparison, and treats a movement under two accuracy points as steady.
+
+Adaptive difficulty was previously dead code: `createSession` was called with
+`adaptive: false` and the next session's level was seeded from the last
+*chosen* value, so a player who worked up to six steps reopened at three.
+Adaptation now happens between sessions through `recommendNextLevel`, holding
+the player inside the 70–85% success band the science brief specifies. Within a
+session the level stays fixed, because the style essence requires one clear
+cognitive demand per session.
+
+Adaptation is deliberately **asymmetric**. Advancing requires a sustained
+window of three sessions above the band ceiling at that level, so one lucky
+session cannot raise the demand. Easing happens immediately after a single
+session below a struggle threshold, because asking someone to repeat a level
+they just failed outright — twice — to satisfy a symmetric rule is precisely
+the kind of pressure this product avoids.
+
+Only Pulse Path, Digit Hold, and Signal Sweep expose a scalable demand.
+Rule Shift, Vector Match, Trace Pair, and Name Recall take no difficulty
+parameter in their generators and therefore present one fixed demand; giving
+them a scalable dimension remains open.
+
+Recommendations are snapped onto each exercise's legal step, so Signal Sweep
+can never be asked for an odd candidate count it cannot build.
+
+## ADR-019: A scalable demand for every exercise
+
+**Status:** Accepted — July 28, 2026
+
+ADR-018 turned adaptation on but only three exercises could respond to it.
+`generateRuleShiftTrial`, `generateVectorMatchTrial`, `generateTracePairTrial`,
+and `generateNameRecallTrial` each took only `(seed, roundIndex)`, so four of
+seven exercises presented one fixed demand forever and adaptation silently did
+nothing for them.
+
+Each now scales the dimension that genuinely governs its difficulty rather than
+the one easiest to vary:
+
+- **Trace Pair — assemblies per round (4–8, step 2).** More assemblies means
+  more pairwise topology comparisons to hold before answering. Bounded by the
+  topology library, which must supply one matching topology plus
+  `optionCount - 2` distinct distractors.
+- **Name Recall — people per round (3–5).** The associative load is the number
+  of face-to-name bindings carried across the retention gap. Bounded by the
+  smaller name pool, because every portrait must draw from its matching pool.
+- **Vector Match — angular disparity (5 bands, 36°–216°).** Mental-rotation
+  difficulty rises with the angle between the figures, so the level selects the
+  disparity band instead of adding figures. The top band straddles the
+  half-turn, where the comparison is hardest.
+- **Rule Shift — interfering rounds (0–3 of 3).** A trial is incongruent when
+  position and arrow disagree, so the ignored attribute actively competes.
+  Congruent trials need no interference control at all. Because a session is
+  only three rounds, the level sets an *exact* count of incongruent rounds
+  chosen from the session seed, rather than a probability that would vary
+  wildly across so few trials.
+
+Every generator keeps its existing signature through a defaulted third
+parameter, so an omitted level reproduces the previous behaviour exactly; tests
+assert this for each. Requests outside a range are clamped, and stepped ranges
+snap onto their step, with ties resolving upward so a nudge never quietly
+reduces the demand.
+
+Each setup screen now exposes its own control, labelled with what the number
+changes — "assemblies per round", not "difficulty" — so the player can see the
+demand rather than infer it.
+
+None of these dimensions is a measure of general ability. Angular disparity is
+not spatial intelligence, interference count is not executive function, and
+people per round is not memory capacity.
+
 ## Deferred Decisions
 
 - Account provider and cross-device synchronization.
 - Privacy-preserving product analytics.
 - Notifications and streak mechanics.
 - Selection and validation of future Daily Circuit exercises.
+- A dedicated diagnostics view showing per-exercise trends, best span, and
+  24-hour and 7-day retention over the stored observations.
 - Backend hosting and operational monitoring.
 - Trademark clearance and final store identity.

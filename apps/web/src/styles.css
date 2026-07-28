@@ -1,12 +1,76 @@
+/*
+ * Typefaces.
+ * Both families are self-hosted, so the instrument renders identically on every
+ * platform and makes no third-party request. Inter (SIL OFL 1.1) carries every
+ * control, metric, and eyebrow; Newsreader (SIL OFL 1.1) carries the major
+ * moments the style essence reserves for an editorial serif. Vite fingerprints
+ * these URLs and rewrites them against the deploy base, so the relative paths
+ * below survive the GitHub Pages subpath.
+ */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("./fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("./fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("./fonts/newsreader-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("./fonts/newsreader-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
   color-scheme: dark;
-  font-family:
-    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
   color: #e8edf3;
   background: #0b1420;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /*
+   * Type stacks. Reference these rather than naming a family inline so a future
+   * change to the pair happens in exactly one place.
+   */
+  --font-sans:
+    "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   --ink: #e8edf3;
   --ink-soft: #96a4b5;
   --paper: #0b1420;
@@ -14,13 +78,13 @@
   --surface-subtle: #182638;
   --line: #34455a;
   --line-strong: #53677f;
-  --green: #4a6f8b;
-  --green-deep: #2d526d;
-  --green-soft: #172a3c;
-  --lime: #c3a15b;
-  --coral: #b08d45;
-  --coral-soft: #2b281f;
-  --blue: #7892a6;
+  --mineral: #4a6f8b;
+  --mineral-deep: #2d526d;
+  --mineral-soft: #172a3c;
+  --gold: #c3a15b;
+  --gold-deep: #b08d45;
+  --gold-soft: #2b281f;
+  --steel: #7892a6;
   --shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
   --radius-large: 10px;
   --radius-medium: 7px;
@@ -69,7 +133,7 @@ button {
 }
 
 button:focus-visible {
-  outline: 3px solid var(--lime);
+  outline: 3px solid var(--gold);
   outline-offset: 4px;
 }
 
@@ -126,7 +190,7 @@ button:focus-visible {
   gap: 4px;
   padding: 7px;
   border-radius: 12px;
-  background: var(--green);
+  background: var(--mineral);
   transform: rotate(-5deg);
   box-shadow: 0 5px 15px rgba(11, 99, 71, 0.2);
 }
@@ -139,7 +203,7 @@ button:focus-visible {
 
 .brand-mark i:nth-child(2),
 .brand-mark i:nth-child(3) {
-  background: var(--lime);
+  background: var(--gold);
 }
 
 .brand strong,
@@ -148,7 +212,7 @@ button:focus-visible {
 }
 
 .brand strong {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 19px;
   letter-spacing: -0.02em;
 }
@@ -186,11 +250,11 @@ button:focus-visible {
 .utility-button[aria-pressed="true"] {
   border-color: var(--line);
   background: var(--surface);
-  color: var(--green);
+  color: var(--mineral);
 }
 
 .utility-button[aria-pressed="true"] {
-  box-shadow: inset 0 0 0 1px var(--green);
+  box-shadow: inset 0 0 0 1px var(--mineral);
 }
 
 .contrast-icon {
@@ -223,7 +287,7 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--green);
+  color: var(--mineral);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -233,7 +297,7 @@ main {
 .eyebrow::before {
   width: 26px;
   height: 2px;
-  background: var(--coral);
+  background: var(--gold-deep);
   content: "";
 }
 
@@ -241,7 +305,7 @@ main {
   max-width: 640px;
   margin: 23px 0 24px;
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(52px, 6vw, 80px);
   font-weight: 400;
   letter-spacing: -0.052em;
@@ -249,7 +313,7 @@ main {
 }
 
 .hero-copy h1 em {
-  color: var(--green);
+  color: var(--mineral);
   font-weight: 400;
 }
 
@@ -257,7 +321,7 @@ main {
   max-width: 560px;
   margin: 0;
   color: var(--ink-soft);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 19px;
   line-height: 1.63;
 }
@@ -281,7 +345,7 @@ main {
 
 .session-facts strong {
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.03em;
@@ -293,7 +357,7 @@ main {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--gold-deep);
 }
 
 .hero-actions,
@@ -311,7 +375,7 @@ main {
   justify-content: center;
   gap: 22px;
   padding: 0 24px;
-  border: 2px solid var(--green);
+  border: 2px solid var(--mineral);
   border-radius: 999px;
   cursor: pointer;
   font-size: 14px;
@@ -323,13 +387,13 @@ main {
 }
 
 .primary-button {
-  background: var(--green);
+  background: var(--mineral);
   color: #fff;
   box-shadow: 0 9px 24px rgba(11, 99, 71, 0.2);
 }
 
 .primary-button:hover {
-  background: var(--green-deep);
+  background: var(--mineral-deep);
   box-shadow: 0 12px 29px rgba(11, 99, 71, 0.25);
   transform: translateY(-2px);
 }
@@ -340,11 +404,11 @@ main {
 
 .secondary-button {
   background: transparent;
-  color: var(--green);
+  color: var(--mineral);
 }
 
 .secondary-button:hover {
-  background: var(--green-soft);
+  background: var(--mineral-soft);
   transform: translateY(-2px);
 }
 
@@ -423,8 +487,8 @@ main {
 }
 
 .preview-grid .preview-active {
-  background: var(--green);
-  border-color: var(--green);
+  background: var(--mineral);
+  border-color: var(--mineral);
   box-shadow: 0 7px 20px rgba(11, 99, 71, 0.19);
 }
 
@@ -462,7 +526,7 @@ main {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--gold-deep);
 }
 
 .preview-orbit {
@@ -472,7 +536,7 @@ main {
   height: 13px;
   border: 3px solid var(--surface);
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--gold-deep);
   box-shadow: 0 4px 12px rgba(32, 39, 34, 0.16);
 }
 
@@ -486,7 +550,7 @@ main {
   left: 8%;
   width: 10px;
   height: 10px;
-  background: var(--blue);
+  background: var(--steel);
 }
 
 .how-it-works {
@@ -503,7 +567,7 @@ main {
 .how-it-works > h2,
 .recent-practice h2 {
   margin: 8px 0 28px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 32px;
   font-weight: 400;
   letter-spacing: -0.035em;
@@ -538,7 +602,7 @@ main {
   top: 4px;
   right: 25px;
   color: #c9c8c0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 30px;
   font-style: italic;
 }
@@ -550,8 +614,8 @@ main {
   grid-row: 1 / span 2;
   place-items: center;
   border-radius: 18px;
-  background: var(--green-soft);
-  color: var(--green);
+  background: var(--mineral-soft);
+  color: var(--mineral);
 }
 
 .watch-icon i {
@@ -559,8 +623,8 @@ main {
   height: 17px;
   border: 5px solid var(--surface);
   border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 0 3px var(--green);
+  background: var(--mineral);
+  box-shadow: 0 0 0 3px var(--mineral);
 }
 
 .hold-icon {
@@ -572,7 +636,7 @@ main {
   width: 5px;
   height: 19px;
   border-radius: 5px;
-  background: var(--green);
+  background: var(--mineral);
 }
 
 .hold-icon i:nth-child(2) {
@@ -587,7 +651,7 @@ main {
 .steps h3 {
   align-self: end;
   margin: 4px 0 5px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 22px;
   font-weight: 500;
 }
@@ -631,8 +695,8 @@ main {
 }
 
 .history-list strong {
-  color: var(--green);
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--mineral);
+  font-family: var(--font-serif);
   font-size: 25px;
   font-weight: 500;
 }
@@ -668,7 +732,7 @@ main {
 }
 
 .quiet-button:hover {
-  color: var(--green);
+  color: var(--mineral);
 }
 
 .round-progress {
@@ -696,7 +760,7 @@ main {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--green);
+  background: var(--mineral);
   transition: width 350ms ease;
 }
 
@@ -705,7 +769,7 @@ main {
   padding: 9px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  color: var(--green);
+  color: var(--mineral);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -746,8 +810,8 @@ main {
   gap: 8px;
   padding: 8px 13px;
   border-radius: 999px;
-  background: var(--green-soft);
-  color: var(--green);
+  background: var(--mineral-soft);
+  color: var(--mineral);
   font-size: 10px;
   font-weight: 850;
   letter-spacing: 0.13em;
@@ -766,13 +830,13 @@ main {
 }
 
 .phase-feedback {
-  background: var(--coral-soft);
+  background: var(--gold-soft);
   color: #9b3e29;
 }
 
 .game-card h1 {
   margin: 18px 0 9px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(34px, 5vw, 46px);
   font-weight: 400;
   letter-spacing: -0.04em;
@@ -820,7 +884,7 @@ main {
 }
 
 .path-tile:not(:disabled):hover {
-  border-color: var(--green);
+  border-color: var(--mineral);
   background: #f4faf6;
   transform: translateY(-2px);
 }
@@ -836,7 +900,7 @@ main {
   top: 9px;
   left: 11px;
   color: #94968e;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 750;
 }
@@ -856,10 +920,10 @@ main {
 
 .path-tile.is-active {
   z-index: 2;
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--mineral);
+  background: var(--mineral);
   box-shadow:
-    0 0 0 6px var(--green-soft),
+    0 0 0 6px var(--mineral-soft),
     0 10px 26px rgba(11, 99, 71, 0.29);
   transform: scale(1.045);
 }
@@ -870,19 +934,19 @@ main {
 
 .path-tile.is-active .tile-core {
   width: 38%;
-  border-color: var(--lime);
-  background: var(--lime);
+  border-color: var(--gold);
+  background: var(--gold);
   box-shadow: 0 0 0 8px rgba(183, 217, 103, 0.2);
 }
 
 .path-tile.is-selected {
-  border-color: var(--green);
+  border-color: var(--mineral);
   background: #e5f0e9;
 }
 
 .path-tile.is-selected .tile-core {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--mineral);
+  background: var(--mineral);
 }
 
 .round-status {
@@ -924,8 +988,8 @@ main {
 }
 
 .response-pips .filled {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--mineral);
+  background: var(--mineral);
 }
 
 .keyboard-hint {
@@ -966,7 +1030,7 @@ main {
 .round-points {
   display: inline-block;
   margin-top: 5px;
-  color: var(--green);
+  color: var(--mineral);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -985,7 +1049,7 @@ main {
   flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--mineral);
   color: white;
   font-size: 20px;
   font-weight: 800;
@@ -998,7 +1062,7 @@ main {
 .result-banner strong {
   display: block;
   margin-bottom: 3px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 19px;
   font-weight: 500;
 }
@@ -1048,20 +1112,20 @@ main {
   border: 1px solid var(--line-strong);
   border-radius: 11px;
   background: #f0eee7;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 800;
 }
 
 .path-comparison li.match {
-  border-color: var(--green);
-  background: var(--green-soft);
-  color: var(--green-deep);
+  border-color: var(--mineral);
+  background: var(--mineral-soft);
+  color: var(--mineral-deep);
 }
 
 .path-comparison li.mismatch {
   border: 2px dashed #b34f38;
-  background: var(--coral-soft);
+  background: var(--gold-soft);
   color: #7c2d1d;
 }
 
@@ -1125,7 +1189,7 @@ main {
   margin: 0 auto 20px;
   place-items: center;
   border-radius: 19px;
-  background: var(--green);
+  background: var(--mineral);
   color: white;
   box-shadow: 0 9px 23px rgba(11, 99, 71, 0.22);
   font-size: 24px;
@@ -1138,7 +1202,7 @@ main {
 
 .summary-card h1 {
   margin: 13px 0 10px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 49px;
   font-weight: 400;
   letter-spacing: -0.045em;
@@ -1148,7 +1212,7 @@ main {
   max-width: 480px;
   margin: 0 auto;
   color: var(--ink-soft);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 16px;
   line-height: 1.55;
 }
@@ -1173,8 +1237,8 @@ main {
 }
 
 .summary-stats strong {
-  color: var(--green);
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--mineral);
+  font-family: var(--font-serif);
   font-size: 38px;
   font-weight: 500;
   letter-spacing: -0.04em;
@@ -1213,12 +1277,12 @@ main {
   flex: 0 0 auto;
   place-items: center;
   border-radius: 10px;
-  background: var(--green);
+  background: var(--mineral);
   color: white;
 }
 
 .next-session-note strong {
-  color: var(--green-deep);
+  color: var(--mineral-deep);
   font-size: 12px;
 }
 
@@ -1253,7 +1317,7 @@ main {
   place-items: center;
   border: 1px solid var(--line-strong);
   border-radius: 50%;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 13px;
   font-style: italic;
   font-weight: 700;
@@ -1631,7 +1695,7 @@ main {
 }
 
 .daily-badge-mark strong {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 780;
   letter-spacing: -0.05em;
@@ -1639,7 +1703,7 @@ main {
 }
 
 .daily-badge-mark small {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 5px;
   font-weight: 760;
   letter-spacing: 0.04em;
@@ -2081,11 +2145,11 @@ html[data-contrast="high"] {
   --surface-subtle: #ececec;
   --line: #444;
   --line-strong: #111;
-  --green: #004f35;
-  --green-deep: #003321;
-  --green-soft: #caead9;
-  --coral: #bb2f10;
-  --coral-soft: #ffe0d8;
+  --mineral: #004f35;
+  --mineral-deep: #003321;
+  --mineral-soft: #caead9;
+  --gold-deep: #bb2f10;
+  --gold-soft: #ffe0d8;
 }
 
 html[data-contrast="high"],
@@ -2136,8 +2200,7 @@ html:not([data-contrast="high"]) .steps h3,
 html:not([data-contrast="high"]) .game-card h1,
 html:not([data-contrast="high"]) .summary-card h1,
 html:not([data-contrast="high"]) .result-banner strong {
-  font-family:
-    "Segoe UI Variable Display", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 html:not([data-contrast="high"]) .brand strong {
@@ -2290,7 +2353,7 @@ html:not([data-contrast="high"]) .recent-practice h2 {
 
 html:not([data-contrast="high"]) .steps article > span {
   color: #536579;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--font-mono);
   font-style: normal;
 }
 
@@ -2470,7 +2533,7 @@ html:not([data-contrast="high"]) .evidence-note {
 html:not([data-contrast="high"]) .evidence-icon {
   border-radius: 3px;
   color: #b08d45;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--font-mono);
   font-style: normal;
 }
 
@@ -3885,7 +3948,7 @@ html[data-contrast="high"] .network-signal line {
 .library-intro h1 {
   margin: 14px 0 0;
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(54px, 7vw, 88px);
   font-weight: 500;
   letter-spacing: -0.055em;
@@ -4038,7 +4101,7 @@ html[data-contrast="high"] .network-signal line {
   border-radius: 3px;
   background: #142232;
   color: #8ca1b3;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 25px;
   font-style: normal;
   font-weight: 600;
@@ -4077,7 +4140,7 @@ html[data-contrast="high"] .network-signal line {
 .game-choice-copy strong {
   margin-bottom: 12px;
   color: #e8edf3;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(34px, 4vw, 48px);
   font-weight: 500;
   letter-spacing: -0.035em;
@@ -4132,7 +4195,7 @@ html[data-contrast="high"] .network-signal line {
 .library-recent h2 {
   margin: 0 0 6px;
   color: #dce5ec;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 25px;
   font-weight: 500;
 }
@@ -4170,7 +4233,7 @@ html[data-contrast="high"] .network-signal line {
 
 .number-card h1 {
   margin: 21px 0 26px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(38px, 5vw, 58px);
   font-weight: 500;
   letter-spacing: -0.045em;
@@ -4179,7 +4242,7 @@ html[data-contrast="high"] .network-signal line {
 .memory-number {
   margin: 18px 0 36px;
   color: #d9e2e9;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(54px, 10vw, 108px);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
@@ -4216,7 +4279,7 @@ html[data-contrast="high"] .network-signal line {
   outline: 0;
   background: transparent;
   color: #e8edf3;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(39px, 7vw, 68px);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
@@ -4296,7 +4359,7 @@ html[data-contrast="high"] .network-signal line {
 .number-comparison strong {
   margin-top: 8px;
   color: #d9e2e9;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(24px, 4vw, 38px);
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -4317,14 +4380,14 @@ html[data-contrast="high"] .network-signal line {
   border: 1px solid #52677b;
   border-radius: 3px;
   color: #b08d45;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 15px;
   letter-spacing: 0.12em;
 }
 
 .number-summary h1 {
   margin: 14px 0 12px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(42px, 6vw, 68px);
   font-weight: 500;
 }
@@ -4857,7 +4920,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 .library-intro h1 {
   margin: 14px 0 18px;
   color: #e8edf3;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(48px, 7.5vw, 84px);
   font-weight: 400;
   letter-spacing: -0.055em;
@@ -4999,7 +5062,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
   gap: 5px;
   width: auto;
   color: #7793a9;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 45px;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -5036,7 +5099,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 
 .game-choice-copy strong {
   color: #f0f3f6;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(30px, 4vw, 42px);
   font-weight: 400;
   letter-spacing: -0.035em;
@@ -5087,7 +5150,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 .library-recent h2 {
   margin: 7px 0 2px;
   color: #dce3ea;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 28px;
   font-weight: 400;
 }
@@ -5121,7 +5184,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 .number-card h1 {
   margin: 20px 0 18px;
   color: #edf1f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(38px, 6vw, 58px);
   font-weight: 400;
   letter-spacing: -0.045em;
@@ -5130,7 +5193,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 .memory-number {
   margin: 52px 0 30px;
   color: #d7bb7f;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(52px, 10vw, 98px);
   font-variant-numeric: tabular-nums;
   font-weight: 550;
@@ -5250,7 +5313,7 @@ html[data-contrast="high"] .round-confirmation.is-miss {
 .countdown-drop-readout strong {
   margin-bottom: 4px;
   color: #d7ba75;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 21px;
   font-variant-numeric: tabular-nums;
 }
@@ -5349,7 +5412,7 @@ html[data-contrast="high"] .countdown-drop-hourglass {
 .countdown-label strong {
   min-width: 1ch;
   color: #c9ae72;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
@@ -5426,7 +5489,7 @@ html[data-contrast="high"] .countdown-drop-hourglass {
 }
 
 .inline-recall-feedback strong {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 22px;
   font-weight: 400;
 }
@@ -5493,7 +5556,7 @@ html[data-contrast="high"] .countdown-progress {
   outline: 0;
   background: transparent;
   color: #e9edf2;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(42px, 8vw, 72px);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.13em;
@@ -5567,7 +5630,7 @@ html[data-contrast="high"] .countdown-progress {
 
 .number-comparison strong {
   color: #dbe2e9;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 23px;
   letter-spacing: 0.09em;
 }
@@ -5593,14 +5656,14 @@ html[data-contrast="high"] .countdown-progress {
   border: 1px solid #b08d45;
   border-radius: 50%;
   color: #d8bd83;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 18px;
 }
 
 .number-summary h1 {
   margin: 14px 0;
   color: #edf1f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(48px, 8vw, 72px);
   font-weight: 400;
   letter-spacing: -0.05em;
@@ -5631,7 +5694,7 @@ html[data-contrast="high"] .countdown-progress {
 
 .number-summary-stats strong {
   color: #e9edf2;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 38px;
   font-weight: 400;
 }
@@ -5722,7 +5785,7 @@ html[data-contrast="high"] .countdown-progress {
 
 .digit-span-stepper output strong {
   color: #d7bb7f;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 74px;
   font-variant-numeric: tabular-nums;
   font-weight: 550;
@@ -6498,7 +6561,7 @@ html:not([data-contrast="high"])
   flex: 0 0 auto;
   place-items: center;
   color: #b9964e;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 20px;
   line-height: 1;
 }
@@ -6537,7 +6600,7 @@ html:not([data-contrast="high"])
   place-items: center;
   border: 1px solid currentColor;
   border-radius: 50%;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 8px;
   font-style: normal;
   letter-spacing: 0;
@@ -6567,13 +6630,13 @@ html[data-theme="light"] {
   --surface-subtle: #e7ecef;
   --line: #bcc7cf;
   --line-strong: #889ba9;
-  --green: #456b87;
-  --green-deep: #315773;
-  --green-soft: #dbe5eb;
-  --lime: #9a752f;
-  --coral: #9a752f;
-  --coral-soft: #eee5d2;
-  --blue: #55778f;
+  --mineral: #456b87;
+  --mineral-deep: #315773;
+  --mineral-soft: #dbe5eb;
+  --gold: #9a752f;
+  --gold-deep: #9a752f;
+  --gold-soft: #eee5d2;
+  --steel: #55778f;
   --shadow: 0 22px 70px rgba(45, 61, 73, 0.14);
 }
 
@@ -7722,7 +7785,7 @@ html[data-theme="light"] .game-library .game-node-drift {
 
 .practice-charge-copy strong {
   color: #d5b265;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 16px;
   font-variant-numeric: tabular-nums;
   font-weight: 650;
@@ -8088,7 +8151,7 @@ html:not([data-contrast="high"])
 .game-orbit-center strong {
   margin-top: 4px;
   color: #d7e2e9;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 24px;
   line-height: 1;
 }
@@ -8212,7 +8275,7 @@ html:not([data-contrast="high"])
   display: flex;
   gap: 4px;
   color: #9cb2c0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
 }
 
@@ -8345,7 +8408,7 @@ html:not([data-contrast="high"])
 
 .rule-shift-card h1 {
   margin: 22px 0 10px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(44px, 5vw, 66px);
   font-weight: 500;
   letter-spacing: -0.045em;
@@ -9026,8 +9089,7 @@ html[data-contrast="high"] .blueprint-node {
 .orbit-heading h1 {
   margin: 0;
   color: #edf2f5;
-  font-family:
-    "Segoe UI Variable Display", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(42px, 6.8vw, 86px);
   font-weight: 650;
   letter-spacing: -0.055em;
@@ -9280,7 +9342,7 @@ html[data-contrast="high"] .blueprint-node {
   align-items: center;
   gap: 2px;
   color: #9db2bf;
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 17px;
   font-weight: 650;
   letter-spacing: -0.12em;
@@ -9336,8 +9398,7 @@ html[data-contrast="high"] .blueprint-node {
 
 .orbit-game-copy strong {
   color: #edf2f5;
-  font-family:
-    "Segoe UI Variable Display", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 22px;
   font-weight: 650;
   letter-spacing: -0.035em;
@@ -9924,7 +9985,7 @@ html[data-contrast="high"] .rule-signal-guide {
 
 .orbit-heading h1 {
   color: #edf1f3;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(52px, 7.2vw, 88px);
   font-weight: 400;
   letter-spacing: -0.058em;
@@ -10118,7 +10179,7 @@ html[data-contrast="high"] .rule-signal-guide {
 }
 
 .orbit-game-copy strong {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 23px;
   font-weight: 500;
   letter-spacing: -0.035em;
@@ -10403,7 +10464,7 @@ html[data-contrast="high"] .dyson-orbit path {
 .orbit-game-copy strong {
   display: block;
   color: #edf2f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 22px;
   font-weight: 500;
   font-style: normal;
@@ -10952,7 +11013,7 @@ html[data-contrast="high"] .core-orbit-plane path {
     inset 0 0 0 3px rgba(8, 23, 34, 0.55),
     0 0 12px rgba(91, 134, 160, 0.1);
   color: #d7e3e9;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 850;
   letter-spacing: 0;
@@ -11083,7 +11144,7 @@ html[data-theme="light"] .game-node-session-count {
 
 .orbit-glyph-digit {
   fill: #b9cad3;
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 37px;
   font-weight: 650;
 }
@@ -11511,7 +11572,7 @@ html[data-contrast="high"] .orbit-game-glyph text {
 .vector-match-card h1 {
   margin: 16px 0 9px;
   color: #edf2f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(42px, 5vw, 60px);
   font-weight: 400;
   letter-spacing: -0.052em;
@@ -11718,7 +11779,7 @@ html[data-contrast="high"] .orbit-game-glyph text {
 
 .signal-sweep-count-stepper output strong {
   color: #edf2f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 26px;
   font-weight: 400;
 }
@@ -12252,7 +12313,7 @@ html[data-contrast="high"] .orbit-game-glyph text {
 .vector-match-summary h1 {
   margin: 13px 0 12px;
   color: #edf2f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(50px, 7vw, 72px);
   font-weight: 400;
   letter-spacing: -0.055em;
@@ -12291,7 +12352,7 @@ html[data-contrast="high"] .orbit-game-glyph text {
 .signal-sweep-summary-stats strong,
 .vector-match-summary-stats strong {
   color: #e6edf1;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 38px;
   font-weight: 400;
   letter-spacing: -0.035em;
@@ -12562,7 +12623,7 @@ html[data-contrast="high"] .vector-match-shape-index {
   color: #a8bbc7;
   clip-path: polygon(15% 0, 84% 4%, 100% 26%, 94% 86%, 73% 100%, 8% 91%, 0 24%);
   cursor: pointer;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 15px;
   line-height: 1;
   opacity: 0.62;
@@ -12967,7 +13028,7 @@ html[data-theme="light"] .daily-circuit-core > .daily-circuit-initiate {
   z-index: 2;
   margin-top: 5px;
   color: #f5f7f8;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -13105,7 +13166,7 @@ html[data-contrast="high"] .circuit-reserve {
 
 .pace-bonus-copy strong {
   color: #c8a45c;
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   font-weight: 760;
@@ -13354,7 +13415,7 @@ html[data-contrast="high"] .pace-bonus-marker svg {
 .trace-pair-summary h1 {
   margin: 0;
   color: #edf3f6;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(40px, 5.3vw, 66px);
   font-weight: 500;
   letter-spacing: -0.045em;
@@ -13789,7 +13850,7 @@ html[data-contrast="high"] .pace-bonus-marker svg {
 
 .trace-pair-summary-stats strong {
   color: #e9f0f3;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 36px;
   font-weight: 500;
 }
@@ -14135,7 +14196,7 @@ html[data-contrast="high"] .trace-pair-datum-line {
   align-items: baseline;
   min-width: 0;
   color: #dfe8ec;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 16px;
   font-weight: 690;
   letter-spacing: -0.045em;
@@ -14145,7 +14206,7 @@ html[data-contrast="high"] .trace-pair-datum-line {
 .daily-diagnostic strong i {
   margin-left: 3px;
   color: rgba(150, 175, 189, 0.76);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 5.5px;
   font-style: normal;
   font-weight: 720;
@@ -14297,7 +14358,7 @@ html[data-contrast="high"] .daily-diagnostic strong i {
   align-items: baseline;
   gap: 3px;
   color: #dfe8ec;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 720;
   letter-spacing: -0.055em;
@@ -14954,7 +15015,7 @@ html:not([data-contrast="high"]) .accessibility-controls .utility-button {
 
   .game-library .orbit-game-copy .game-node-success b {
     color: #fff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 15px;
     font-weight: 850;
     letter-spacing: -0.03em;
@@ -15167,7 +15228,7 @@ html[data-motion="reduced"] .path-grid .network-resolution line {
 .name-recall-summary h1 {
   margin: 20px 0 8px;
   color: #edf2f5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: clamp(42px, 5vw, 70px);
   font-weight: 500;
   letter-spacing: -0.045em;
@@ -15321,7 +15382,7 @@ html[data-motion="reduced"] .path-grid .network-resolution line {
 .name-recall-contact strong {
   margin-top: 14px;
   color: #f0f4f6;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 27px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -15436,7 +15497,7 @@ html[data-motion="reduced"] .path-grid .network-resolution line {
   border: 1px solid rgba(103, 144, 169, 0.56);
   background: rgba(13, 30, 43, 0.82);
   color: #e7eef2;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 21px;
   cursor: pointer;
   clip-path: polygon(6% 0, 94% 0, 100% 34%, 94% 100%, 4% 94%, 0 25%);
@@ -15478,7 +15539,7 @@ html[data-motion="reduced"] .path-grid .network-resolution line {
   place-items: center;
   border: 1px solid rgba(132, 168, 189, 0.7);
   color: #c19b4e;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 22px;
   clip-path: polygon(14% 0, 87% 5%, 100% 35%, 89% 88%, 52% 100%, 5% 80%, 0 26%);
 }
@@ -16591,4 +16652,1018 @@ html[data-theme="light"] .game-library .game-choice.is-complete .game-node-drift
     bottom: auto;
     left: 0;
   }
+}
+
+/* ==========================================================================
+ * Instrument refinement.
+ *
+ * One late layer that resolves the product against the style essence:
+ * an editorial serif that is actually engineered, a light theme that is
+ * legible, and game screens that speak the same blueprint language as the
+ * home circuit instead of sitting inside a generic card.
+ *
+ * Everything here is scoped away from `[data-contrast="high"]`, which
+ * deliberately trades the aesthetic for WCAG contrast and must keep its
+ * solid fills, hard borders, and saturated signal colors.
+ * ========================================================================== */
+
+:root {
+  /* Shallow bevel for controls, so buttons join the faceted shape family. */
+  --cut-control: polygon(
+    0 0,
+    calc(100% - 11px) 0,
+    100% 11px,
+    100% 100%,
+    11px 100%,
+    0 calc(100% - 11px)
+  );
+  --success: #8db4a1;
+}
+
+/* --------------------------------------------------------------------------
+ * 1. Type calibration.
+ *
+ * Newsreader sets a lighter color than Georgia at the same nominal weight and
+ * its wedge serifs sharpen under negative tracking. Every serif slot therefore
+ * gains weight and gives back most of the tightening it inherited.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .orbit-game-copy strong,
+html:not([data-contrast="high"])
+  .game-library
+  .orbit-game-selector
+  > .game-choice
+  .orbit-game-copy
+  strong,
+html:not([data-contrast="high"])
+  .game-library
+  .circuit-drag-ghost
+  .orbit-game-copy
+  strong {
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  font-optical-sizing: auto;
+}
+
+/*
+ * The phase title was forced to the sans stack while the setup title kept the
+ * serif, so one slot rendered two ways. Both are "major moments"; both are
+ * serif, and both step down in size so the task outranks its own label.
+ */
+html:not([data-contrast="high"]) .game-card h1,
+html:not([data-contrast="high"]) .summary-card h1,
+html:not([data-contrast="high"]) .number-card h1 {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+}
+
+html:not([data-contrast="high"]) .game-card h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(26px, 2.7vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.018em;
+}
+
+html:not([data-contrast="high"]) .number-card h1 {
+  margin: 16px 0 12px;
+  font-size: clamp(27px, 3vw, 37px);
+  font-weight: 500;
+  letter-spacing: -0.018em;
+}
+
+/* Metrics are read in columns; lock the figures to one width. */
+html:not([data-contrast="high"]) .practice-charge-copy strong,
+html:not([data-contrast="high"]) .game-node-session-count,
+html:not([data-contrast="high"]) .game-node-success,
+html:not([data-contrast="high"]) .daily-diagnostic-value,
+html:not([data-contrast="high"]) .round-status strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+ * 2. Node copy: fit the eyebrow, keep the column inside the polygon.
+ *
+ * "Associative memory" and "Relational matching" were clipping mid-word. The
+ * column gains ten pixels and the eyebrow gives back tracking rather than
+ * losing its last letter.
+ * ------------------------------------------------------------------------ */
+
+@media (min-width: 721px) {
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    > .game-choice
+    .orbit-game-copy,
+  html:not([data-contrast="high"])
+    .game-library
+    .circuit-drag-ghost.is-from-circuit
+    .orbit-game-copy {
+    width: 94px;
+    min-width: 94px;
+  }
+
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    > .game-choice
+    .orbit-game-copy
+    small,
+  html:not([data-contrast="high"])
+    .game-library
+    .circuit-drag-ghost.is-from-circuit
+    .orbit-game-copy
+    small {
+    overflow: visible;
+    letter-spacing: 0.055em;
+    text-overflow: clip;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 3. Light theme: legibility.
+ *
+ * Late high-specificity rules set node copy to near-white with no light-theme
+ * counterpart, so every game's first word and both metric labels rendered at
+ * roughly 1.05:1 on the paper field — invisible. These restate the copy colors
+ * at a specificity that survives, rather than adding another `!important`.
+ * ------------------------------------------------------------------------ */
+
+html[data-theme="light"]:not([data-contrast="high"]) .orbit-game-copy strong,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-selector
+  > .game-choice
+  .orbit-game-copy
+  strong,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .circuit-drag-ghost
+  .orbit-game-copy
+  strong {
+  color: #16293a;
+}
+
+html[data-theme="light"]:not([data-contrast="high"])
+  .orbit-game-copy
+  strong
+  .game-title-accent {
+  color: #7d6128;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .orbit-game-copy small,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  small {
+  color: #5d7183;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-session-label,
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-session-state,
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-success,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  .game-node-session-label,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .game-choice.is-complete
+  .game-node-session-label,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  .game-node-success {
+  color: #46596b;
+}
+
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  .game-node-session-count {
+  border-color: rgba(70, 96, 117, 0.5);
+  color: #16293a;
+}
+
+/*
+ * The exposed shell rule never covered the blueprint SVG's own filter, so a
+ * near-black 24px drop shadow kept printing a grey smudge under every node —
+ * the rectangular backing the style essence forbids in light mode. Replaced
+ * with a shadow tight and cool enough to read as lift, not as a plate.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-blueprint,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .game-node-blueprint,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-selector
+  .game-node-blueprint {
+  filter: drop-shadow(0 4px 8px rgba(37, 61, 82, 0.13));
+}
+
+/*
+ * A warmer paper field. The previous light surface was a cool grey that made
+ * the gold read muddy; this is the quiet paper the style essence describes,
+ * with slate grid lines that stay visible without becoming graph paper.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) body {
+  background:
+    linear-gradient(rgba(58, 88, 112, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58, 88, 112, 0.09) 1px, transparent 1px),
+    radial-gradient(
+      ellipse 90% 65% at 50% 38%,
+      rgba(255, 255, 255, 0.85),
+      transparent 70%
+    ),
+    linear-gradient(145deg, #f2f0ea 0%, #ecebe5 55%, #e4e5e2 100%);
+  background-size: 48px 48px, 48px 48px, auto, auto;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) {
+  background: #ecebe5;
+}
+
+/* --------------------------------------------------------------------------
+ * 4. Game screens speak the blueprint language.
+ *
+ * The exercises sat inside a rounded, bordered, shadowed panel — the
+ * "collection of decorative cards" the style essence rules out, and a direct
+ * contradiction of elements placed in space. The container becomes structure
+ * rather than surface: no plate, no radius, no shadow. The task is the only
+ * thing on the field, and the controls join the faceted shape family.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .game-card,
+html:not([data-contrast="high"]) .number-card,
+html:not([data-contrast="high"]) .summary-card {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+html:not([data-contrast="high"]) .game-card::after,
+html:not([data-contrast="high"]) .number-card::after {
+  display: none;
+}
+
+/*
+ * With the plate gone, the old min-heights were only reserving empty space.
+ * Let the exercise set its own height and centre what remains.
+ */
+html:not([data-contrast="high"]) .game-card {
+  min-height: 0;
+  padding: 26px 40px 30px;
+}
+
+html:not([data-contrast="high"]) .number-card {
+  min-height: 0;
+  margin-top: 14px;
+  padding: clamp(18px, 3vw, 34px) clamp(20px, 4vw, 48px) clamp(24px, 3vw, 40px);
+}
+
+/* The phase marker is a faceted index, not a pill. */
+html:not([data-contrast="high"]) .phase-badge {
+  padding: 7px 14px;
+  border: 1px solid rgba(120, 146, 166, 0.34);
+  border-radius: 0;
+  background: rgba(23, 42, 60, 0.5);
+  clip-path: var(--cut-small);
+  color: #9db3c6;
+  font-weight: 600;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .phase-badge {
+  border-color: rgba(70, 96, 117, 0.3);
+  background: rgba(255, 255, 255, 0.62);
+  color: #4d647b;
+}
+
+html:not([data-contrast="high"]) .phase-badge span {
+  width: 5px;
+  height: 5px;
+  border-radius: 0;
+  rotate: 45deg;
+}
+
+/*
+ * The primary action was the one saturated slab on the screen. It keeps its
+ * gold — it is the dominant action — but takes the bevel so it belongs to the
+ * same geometry as the nodes it launches.
+ */
+html:not([data-contrast="high"]) .primary-button {
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(168deg, #cdaa62 0%, #b48f47 100%);
+  box-shadow: 0 12px 30px rgba(9, 16, 24, 0.34);
+  clip-path: var(--cut-control);
+  color: #101a25;
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+html:not([data-contrast="high"]) .primary-button:hover {
+  background: linear-gradient(168deg, #d8b670 0%, #bf9a50 100%);
+  box-shadow: 0 14px 34px rgba(9, 16, 24, 0.4);
+  transform: none;
+}
+
+/* Steppers become beveled instrument keys rather than rounded tiles. */
+html:not([data-contrast="high"]) .digit-span-stepper > button {
+  border: 1px solid rgba(120, 146, 166, 0.36);
+  border-radius: 0;
+  background: rgba(20, 34, 49, 0.62);
+  box-shadow: none;
+  clip-path: var(--cut-small);
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+html:not([data-contrast="high"]) .digit-span-stepper > button:hover:not(:disabled) {
+  border-color: rgba(195, 161, 91, 0.6);
+  background: rgba(30, 47, 65, 0.85);
+  transform: none;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .digit-span-stepper > button {
+  border-color: rgba(70, 96, 117, 0.32);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/*
+ * The round status row read as three unrelated fragments at three positions.
+ * One baseline, one rhythm, and a hairline that ties it to the field above.
+ */
+html:not([data-contrast="high"]) .round-status {
+  display: flex;
+  width: min(430px, 100%);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(120, 146, 166, 0.2);
+  gap: 16px;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .round-status {
+  border-top-color: rgba(70, 96, 117, 0.2);
+}
+
+html:not([data-contrast="high"]) .round-status .status-label {
+  color: #7d90a4;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+html:not([data-contrast="high"]) .round-status strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Response pips are small diamonds, not keypad squares. */
+html:not([data-contrast="high"]) .response-pips span {
+  border-radius: 0;
+  rotate: 45deg;
+}
+
+/* --------------------------------------------------------------------------
+ * 5. Header: one instrument row.
+ *
+ * The charge module and the preference pair sat at different heights with
+ * different borders, so the row read as two unrelated widgets bolted on. They
+ * now share a height, a bevel, and a border weight.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .site-header {
+  align-items: stretch;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(120, 146, 166, 0.16);
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .site-header {
+  border-bottom-color: rgba(70, 96, 117, 0.18);
+}
+
+html:not([data-contrast="high"]) .practice-charge,
+html:not([data-contrast="high"]) .accessibility-controls {
+  align-self: center;
+  min-height: 42px;
+  border: 1px solid rgba(120, 146, 166, 0.26);
+  border-radius: 0;
+  background: rgba(18, 30, 44, 0.55);
+  box-shadow: none;
+  clip-path: var(--cut-small);
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .practice-charge,
+html[data-theme="light"]:not([data-contrast="high"]) .accessibility-controls {
+  border-color: rgba(70, 96, 117, 0.24);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* The five segments existed in the SVG but were too faint to count. */
+html:not([data-contrast="high"]) .practice-battery-segments path {
+  stroke: rgba(150, 176, 196, 0.5);
+  stroke-width: 1.1;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .practice-battery-segments path {
+  stroke: rgba(70, 96, 117, 0.45);
+}
+
+/* The brand wordmark carries the sans; give it instrument spacing. */
+html:not([data-contrast="high"]) .brand strong {
+  font-weight: 640;
+  letter-spacing: -0.005em;
+}
+
+/* --------------------------------------------------------------------------
+ * 6. Page composition.
+ *
+ * The instrument sat in the upper band with a quarter of the viewport empty
+ * beneath it. The shell now distributes: the exercise takes the free height
+ * and centres in it, and the claims note anchors to the foot of the page.
+ * `safe center` keeps a tall screen pinned to the top rather than clipping its
+ * head, so this never hides the exit control on a short viewport.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .app-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+html:not([data-contrast="high"]) .app-shell > main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: safe center;
+}
+
+html:not([data-contrast="high"]) .app-shell > .evidence-note {
+  margin-top: auto;
+  padding-bottom: 26px;
+}
+
+html:not([data-contrast="high"]) .orbital-library {
+  padding-top: 0;
+}
+
+/*
+ * The success readout puts its value in a bare <b> and its unit in a bare
+ * <span>, both of which were painted pure white further up the cascade. The
+ * parent colour never reached them, so name them directly.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-success b,
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-success span,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  .game-node-success b,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .orbit-game-copy
+  .game-node-success span,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .game-choice.is-complete
+  .game-node-success b,
+html[data-theme="light"]:not([data-contrast="high"])
+  .game-library
+  .game-choice.is-complete
+  .game-node-success span {
+  color: #46596b;
+}
+
+/* The digit glyph on the Digit Hold node needs the same treatment. */
+html[data-theme="light"]:not([data-contrast="high"]) .orbit-glyph-digit {
+  color: #4a6076;
+}
+
+html[data-theme="light"]:not([data-contrast="high"])
+  .orbit-glyph-digit.orbit-glyph-digit-active {
+  color: #7d6128;
+}
+
+/* --------------------------------------------------------------------------
+ * 7. Diagnostic annotations.
+ *
+ * The four cardinal readouts keep their specified widths, but their fill was
+ * translucent enough that the circuit traces behind them showed through the
+ * empty half of each box — which made a deliberate annotation read as a
+ * half-drawn frame. An opaque plate lets them sit on the field as instrument
+ * labels while an em dash is still standing in for data.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .daily-diagnostic {
+  border-color: rgba(112, 149, 172, 0.46);
+  background:
+    linear-gradient(135deg, rgba(66, 99, 119, 0.3), transparent 58%),
+    rgba(9, 20, 30, 0.985);
+  box-shadow:
+    inset 3px 0 0 rgba(191, 155, 79, 0.5),
+    0 6px 16px rgba(2, 9, 14, 0.34);
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .daily-diagnostic {
+  border-color: rgba(70, 96, 117, 0.32);
+  background:
+    linear-gradient(135deg, rgba(214, 226, 234, 0.6), transparent 58%),
+    rgba(252, 252, 250, 0.985);
+  box-shadow:
+    inset 3px 0 0 rgba(151, 120, 54, 0.55),
+    0 4px 12px rgba(37, 61, 82, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+ * 8. Bevel correction.
+ *
+ * `clip-path` cuts the border along with the box, so a bevelled corner drawn
+ * with a stroke arrives with two open ends and reads as torn rather than
+ * faceted. Where a shape is bevelled, the fill defines the silhouette and the
+ * stroke steps aside; where a stroke is needed, the corners stay square.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .practice-charge,
+html:not([data-contrast="high"]) .accessibility-controls,
+html:not([data-contrast="high"]) .phase-badge {
+  border: 0;
+  background: rgba(23, 38, 54, 0.9);
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .practice-charge,
+html[data-theme="light"]:not([data-contrast="high"]) .accessibility-controls,
+html[data-theme="light"]:not([data-contrast="high"]) .phase-badge {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+/* A shallower cut keeps the wide primary action from reading as a parallelogram. */
+html:not([data-contrast="high"]) .primary-button {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+html:not([data-contrast="high"]) .digit-span-stepper > button {
+  border: 0;
+  background: rgba(24, 40, 57, 0.92);
+}
+
+html:not([data-contrast="high"]) .digit-span-stepper > button:hover:not(:disabled) {
+  background: rgba(38, 58, 79, 0.96);
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .digit-span-stepper > button {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+html[data-theme="light"]:not([data-contrast="high"])
+  .digit-span-stepper
+  > button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+/*
+ * Both header instruments settle on the charge module's 42px, which keeps the
+ * row a quarter shorter than the original as the design direction requires
+ * rather than growing to meet the taller control.
+ */
+html:not([data-contrast="high"]) .accessibility-controls .utility-button {
+  min-height: 42px;
+  border-radius: 0;
+  padding: 0 12px;
+}
+
+/* --------------------------------------------------------------------------
+ * 9. Task trend datum.
+ *
+ * One restrained mark beside a game's success readout, shown only once the
+ * engine has two full windows of real observations behind a direction. It
+ * describes performance on that exercise and nothing else.
+ *
+ * Muted green stays reserved for correct resolution and strong task results,
+ * so an improving trend uses it; a declining trend is deliberately quiet
+ * rather than alarming — the product never attaches loss anxiety to a measure.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .game-node-trend {
+  margin-left: 3px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+html:not([data-contrast="high"]) .game-node-trend.is-improving {
+  color: #8db4a1;
+}
+
+html:not([data-contrast="high"]) .game-node-trend.is-declining {
+  color: #8496a8;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-trend.is-improving {
+  color: #4b7d66;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .game-node-trend.is-declining {
+  color: #6b7d8d;
+}
+
+/* --------------------------------------------------------------------------
+ * 10. Every exercise on the field, not only Pulse Path.
+ *
+ * Each exercise had shipped its own container class, so flattening
+ * `.game-card` / `.number-card` / `.summary-card` left Rule Shift, Signal
+ * Sweep, Vector Match, Trace Pair, and Name Recall still sitting inside
+ * bordered panels with 520–620px reserved heights and 56–66px headlines. The
+ * same rules apply to all of them: the task is the object on screen, and the
+ * headline is a label rather than a magazine cover.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .name-recall-card,
+html:not([data-contrast="high"]) .name-recall-setup-card,
+html:not([data-contrast="high"]) .name-recall-summary,
+html:not([data-contrast="high"]) .rule-shift-card,
+html:not([data-contrast="high"]) .rule-shift-setup,
+html:not([data-contrast="high"]) .signal-sweep-card,
+html:not([data-contrast="high"]) .signal-sweep-setup-card,
+html:not([data-contrast="high"]) .signal-sweep-summary,
+html:not([data-contrast="high"]) .vector-match-card,
+html:not([data-contrast="high"]) .vector-match-setup-card,
+html:not([data-contrast="high"]) .vector-match-play-card,
+html:not([data-contrast="high"]) .vector-match-summary,
+html:not([data-contrast="high"]) .trace-pair-card,
+html:not([data-contrast="high"]) .trace-pair-setup-card,
+html:not([data-contrast="high"]) .trace-pair-summary,
+html:not([data-contrast="high"]) .number-summary {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+html:not([data-contrast="high"]) .name-recall-card::before,
+html:not([data-contrast="high"]) .name-recall-card::after,
+html:not([data-contrast="high"]) .signal-sweep-setup-card::before,
+html:not([data-contrast="high"]) .signal-sweep-setup-card::after,
+html:not([data-contrast="high"]) .rule-shift-card::before,
+html:not([data-contrast="high"]) .rule-shift-card::after,
+html:not([data-contrast="high"]) .trace-pair-card::before,
+html:not([data-contrast="high"]) .trace-pair-card::after,
+html:not([data-contrast="high"]) .vector-match-card::before,
+html:not([data-contrast="high"]) .vector-match-card::after {
+  display: none;
+}
+
+/* One headline scale across every exercise and summary. */
+html:not([data-contrast="high"]) .name-recall-card h1,
+html:not([data-contrast="high"]) .name-recall-summary h1,
+html:not([data-contrast="high"]) .rule-shift-card h1,
+html:not([data-contrast="high"]) .signal-sweep-card h1,
+html:not([data-contrast="high"]) .signal-sweep-setup-card h1,
+html:not([data-contrast="high"]) .signal-sweep-summary h1,
+html:not([data-contrast="high"]) .vector-match-card h1,
+html:not([data-contrast="high"]) .vector-match-summary h1,
+html:not([data-contrast="high"]) .trace-pair-card h1,
+html:not([data-contrast="high"]) .trace-pair-summary h1,
+html:not([data-contrast="high"]) .number-summary h1,
+html:not([data-contrast="high"]) .summary-card h1 {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 2.7vw, 34px);
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.018em;
+}
+
+/* --------------------------------------------------------------------------
+ * 11. Micro-type legibility.
+ *
+ * The instrument annotations were set small enough and dim enough to fail
+ * normal-text contrast: the charge denominator and rep count sat near 4:1 at
+ * six and seven pixels, and the pace-bonus label was fainter still. Precision
+ * is part of this product's character, but an unreadable readout is not
+ * restraint. Sizes come up a step and tones lift past 4.5:1 while the
+ * annotations stay subordinate to the screen's primary action.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .practice-charge-copy strong i {
+  color: #93a8bb;
+  font-size: 9.5px;
+}
+
+html:not([data-contrast="high"]) .practice-charge-reps {
+  color: #92a7ba;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+html:not([data-contrast="high"]) .pace-bonus-copy small {
+  color: #93a8bb;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .practice-charge-copy strong i,
+html[data-theme="light"]:not([data-contrast="high"]) .practice-charge-reps,
+html[data-theme="light"]:not([data-contrast="high"]) .pace-bonus-copy small {
+  color: #4f6579;
+}
+
+/* --------------------------------------------------------------------------
+ * 12. Light theme: the exercises.
+ *
+ * The light theme had only ever been completed for the home field. Every
+ * exercise's instruction copy, setup label, stepper unit, and status caption
+ * kept its dark-theme tone — pale blue-grey on paper, most of it under 3:1 —
+ * and two were outright failures: Rule Shift's left/right answer arrows and the
+ * round counter rendered near-white, which made the exercise unreadable rather
+ * than merely faint.
+ *
+ * These are grouped by role rather than patched per selector, so an exercise
+ * added later inherits a legible tone instead of repeating the omission.
+ * ------------------------------------------------------------------------ */
+
+/* Role: primary instruction under a headline. */
+html[data-theme="light"]:not([data-contrast="high"]) .phase-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .number-setup-copy,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-instruction,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-setup-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-setup-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-setup-card > p,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-setup-card > p {
+  color: #3f5568;
+}
+
+/* Role: small uppercase annotation — setup labels, round badges, captions. */
+html[data-theme="light"]:not([data-contrast="high"]) .setup-label,
+html[data-theme="light"]:not([data-contrast="high"]) .no-timer-badge,
+html[data-theme="light"]:not([data-contrast="high"]) .status-label,
+html[data-theme="light"]:not([data-contrast="high"]) .digit-count,
+html[data-theme="light"]:not([data-contrast="high"]) .digit-span-range,
+html[data-theme="light"]:not([data-contrast="high"]) .utility-title,
+html[data-theme="light"]:not([data-contrast="high"]) .practice-charge-copy small,
+html[data-theme="light"]:not([data-contrast="high"]) .brand small,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-setup-label,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-setup-label,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-setup-label,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-setup-label,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-setup-label {
+  color: #44596c;
+}
+
+/* Role: stepper unit and progress copy carrying a bare element. */
+html[data-theme="light"]:not([data-contrast="high"]) .digit-span-stepper output span,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-progress strong,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-progress strong,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-progress strong,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-progress strong,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-progress strong,
+html[data-theme="light"]:not([data-contrast="high"]) .session-progress,
+html[data-theme="light"]:not([data-contrast="high"]) .session-progress strong {
+  color: #2b3f52;
+}
+
+/*
+ * Role: quiet controls that sit directly on the field. Rule Shift's own answer
+ * buttons are handled separately below, because their surface stayed dark.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) .quiet-button,
+html[data-theme="light"]:not([data-contrast="high"]) .quiet-button span,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-exit,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-exit span,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-exit,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-exit span,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-exit,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-exit span,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-exit,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-exit span,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-exit,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-exit span {
+  color: #22364a;
+}
+
+/* Role: gold annotation. Restrained gold needs to darken on paper to hold. */
+html[data-theme="light"]:not([data-contrast="high"]) .pace-bonus-copy strong,
+html[data-theme="light"]:not([data-contrast="high"]) .utility-icon,
+html[data-theme="light"]:not([data-contrast="high"]) .utility-state {
+  color: #7a5f22;
+}
+
+/*
+ * Containers that stayed dark in light mode. Recolouring their text could only
+ * ever trade white-on-light for dark-on-dark; the surface itself is what never
+ * got a light theme, so it is the surface that changes here.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-actions > button {
+  border-color: rgba(70, 96, 117, 0.34);
+  background: rgba(255, 255, 255, 0.82);
+  color: #22364a;
+}
+
+html[data-theme="light"]:not([data-contrast="high"])
+  .rule-shift-actions
+  > button:hover:not(:disabled) {
+  border-color: rgba(151, 120, 54, 0.6);
+  background: #ffffff;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-round-badge,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-round-badge,
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-round-badge,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-round-badge,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-round-badge {
+  border-color: rgba(70, 96, 117, 0.3);
+  background: rgba(255, 255, 255, 0.78);
+  color: #3f5568;
+}
+
+/* Copy that genuinely sits on paper and was simply too pale to read. */
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-choice,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-choice span,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-panel figcaption,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-cue figcaption,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-card figcaption,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-example span,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-count-control > span,
+html[data-theme="light"]:not([data-contrast="high"]) .number-response-form label {
+  color: #33485c;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-task-note,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-task-note,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-task-note,
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-task-note,
+html[data-theme="light"]:not([data-contrast="high"]) .name-recall-task-note {
+  color: #4a5f72;
+}
+
+/* Gold annotations need a deeper tone to hold their own against paper. */
+html[data-theme="light"]:not([data-contrast="high"]) .rule-shift-example i,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-hint,
+html[data-theme="light"]:not([data-contrast="high"]) .vector-match-setup-card span,
+html[data-theme="light"]:not([data-contrast="high"]) .utility-state {
+  color: #6d5420;
+}
+
+/* --------------------------------------------------------------------------
+ * 13. The remaining primary actions.
+ *
+ * Signal Sweep, Trace Pair, and Vector Match ship their own start and
+ * train-again buttons rather than reusing `.primary-button`, so they kept a
+ * flat treatment and, in light mode, pale gold text on paper at 1.5:1. They
+ * join the same beveled gold action as every other exercise.
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .trace-pair-start,
+html:not([data-contrast="high"]) .trace-pair-train-again,
+html:not([data-contrast="high"]) .signal-sweep-start,
+html:not([data-contrast="high"]) .signal-sweep-train-again,
+html:not([data-contrast="high"]) .vector-match-start,
+html:not([data-contrast="high"]) .vector-match-train-again {
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(168deg, #cdaa62 0%, #b48f47 100%);
+  box-shadow: 0 12px 30px rgba(9, 16, 24, 0.34);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+  color: #101a25;
+  font-weight: 650;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+html:not([data-contrast="high"]) .trace-pair-start:hover,
+html:not([data-contrast="high"]) .trace-pair-train-again:hover,
+html:not([data-contrast="high"]) .signal-sweep-start:hover,
+html:not([data-contrast="high"]) .signal-sweep-train-again:hover,
+html:not([data-contrast="high"]) .vector-match-start:hover,
+html:not([data-contrast="high"]) .vector-match-train-again:hover {
+  background: linear-gradient(168deg, #d8b670 0%, #bf9a50 100%);
+  box-shadow: 0 14px 34px rgba(9, 16, 24, 0.4);
+  transform: none;
+}
+
+html:not([data-contrast="high"]) .trace-pair-start span,
+html:not([data-contrast="high"]) .trace-pair-train-again span,
+html:not([data-contrast="high"]) .signal-sweep-start span,
+html:not([data-contrast="high"]) .signal-sweep-train-again span,
+html:not([data-contrast="high"]) .vector-match-start span,
+html:not([data-contrast="high"]) .vector-match-train-again span {
+  color: inherit;
+}
+
+/*
+ * The task notes set their tone with `!important`, so the light theme has to
+ * answer in kind. Matched rather than escalated: same weight, opposite side.
+ */
+html[data-theme="light"]:not([data-contrast="high"]) .trace-pair-task-note,
+html[data-theme="light"]:not([data-contrast="high"]) .signal-sweep-task-note {
+  color: #4a5f72 !important;
+}
+
+/* The pressed-state rule carries an attribute selector, so match its weight. */
+html[data-theme="light"]:not([data-contrast="high"])
+  .utility-button[aria-pressed="true"]
+  .utility-state,
+html[data-theme="light"]:not([data-contrast="high"])
+  .utility-button
+  .utility-state {
+  color: #6d5420;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .number-recall-form label {
+  color: #33485c;
+}
+
+/* --------------------------------------------------------------------------
+ * 14. Difficulty controls on the remaining exercises.
+ *
+ * Trace Pair, Vector Match, Rule Shift, and Name Recall now expose the demand
+ * they scale. They reuse the established stepper so every setup screen offers
+ * the same control in the same place, and the label states what the number
+ * actually changes rather than naming an abstract "difficulty".
+ * ------------------------------------------------------------------------ */
+
+html:not([data-contrast="high"]) .exercise-level-control {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 6px 0 22px;
+}
+
+html:not([data-contrast="high"]) .exercise-level-label {
+  color: #8ea3b6;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+html:not([data-contrast="high"]) .exercise-level-hint {
+  max-width: 340px;
+  margin: 0;
+  color: #7c8fa2;
+  font-size: 11.5px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .exercise-level-label {
+  color: #44596c;
+}
+
+html[data-theme="light"]:not([data-contrast="high"]) .exercise-level-hint {
+  color: #4a5f72;
+}
+
+/* Setup screens carry the same headline scale as their play screens. */
+html:not([data-contrast="high"]) .trace-pair-setup-card h1,
+html:not([data-contrast="high"]) .vector-match-setup-card h1,
+html:not([data-contrast="high"]) .name-recall-setup-card h1,
+html:not([data-contrast="high"]) .rule-shift-setup h1,
+html:not([data-contrast="high"]) .signal-sweep-setup-card h1 {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 2.7vw, 34px);
+  font-weight: 500;
+  font-optical-sizing: auto;
+  letter-spacing: -0.018em;
 }

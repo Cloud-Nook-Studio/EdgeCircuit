@@ -52,12 +52,32 @@ Examples:
 - Starting sequence length: 3
 - Minimum: 2
 - Maximum: 8
-- Two perfect rounds in a row: increase by one
-- Two imperfect rounds in a row: decrease by one
-- An opposite result resets the active streak
 
-The next completed session starts at the final level of the most recent
-completed session. An abandoned session does not change that starting level.
+Every exercise scales one dimension, chosen because it is what actually makes
+that task harder rather than what is easiest to vary:
+
+| Exercise | Dimension | Range |
+| --- | --- | --- |
+| Pulse Path | path length | 2–8 steps |
+| Digit Hold | digit span | 3–9 digits |
+| Signal Sweep | candidate signals | 4–10, step 2 |
+| Trace Pair | assemblies per round | 4–8, step 2 |
+| Vector Match | angular disparity | 5 bands, 36°–216° |
+| Rule Shift | interfering rounds | 0–3 of 3 |
+| Name Recall | people per round | 3–5 |
+
+The chosen level stays fixed for all three rounds so a session has one clear
+cognitive demand. Adaptation happens **between** sessions: the app aims to keep
+a player inside a 70–85% success band on that exercise.
+
+- Three sessions at the current level averaging above the band: increase by one.
+- Three sessions at the current level averaging below the band: decrease by one.
+- A single session well below the band: decrease by one immediately, so nobody
+  is asked to repeat a level they could not hold.
+
+Advancing is deliberately slower than easing. The recommended level persists
+across days and reloads; an abandoned session records nothing and changes
+nothing. See ADR-018.
 
 ## Evidence-aware language
 
@@ -86,7 +106,11 @@ Do not say or imply:
 
 ## Data minimization
 
-Version 0 persists only completed summary metrics and settings. A deterministic
+Version 0 persists only completed summary metrics and settings. Per-game
+progress keeps one record per completed session — timestamp, task accuracy,
+level, exact rounds, and mean response time per item — bounded to the most
+recent 60 sessions per exercise. These are task-specific measures and are never
+described as general ability. A deterministic
 active session may exist transiently while Pulse Path is open, but it is
 cleared on exit or startup and cannot be resumed. The app does not store raw
 tap trails, health data, contacts, precise location, or advertising

@@ -27,6 +27,8 @@ interface SignalSweepRoundResult {
 
 interface SignalSweepProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onCue?: (target: number) => void;
   onExit: () => void;
@@ -113,10 +115,11 @@ export function SignalSweep({
   onCue,
   onExit,
   onFeedback,
+  startingLevel,
 }: SignalSweepProps) {
   const [seed, setSeed] = useState(createSeed);
   const [optionCount, setOptionCount] = useState<number>(
-    SIGNAL_SWEEP_DEFAULT_OPTION_COUNT,
+    startingLevel ?? SIGNAL_SWEEP_DEFAULT_OPTION_COUNT,
   );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<SignalSweepPhase>(

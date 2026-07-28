@@ -12,6 +12,9 @@ import {
   TOTAL_ROUNDS,
   evaluateNameRecallChoice,
   generateNameRecallTrial,
+  NAME_RECALL_DEFAULT_CONTACT_COUNT,
+  NAME_RECALL_MAX_CONTACT_COUNT,
+  NAME_RECALL_MIN_CONTACT_COUNT,
   type NameRecallContact,
   type PracticeChargeRoundInput,
 } from "@brain-training/shared";
@@ -35,6 +38,8 @@ interface NameRecallResult {
 
 interface NameRecallProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onCue?: (target: number) => void;
   onExit: () => void;
@@ -84,8 +89,12 @@ export function NameRecall({
   onCue,
   onExit,
   onFeedback,
+  startingLevel,
 }: NameRecallProps) {
   const [seed, setSeed] = useState(createSeed);
+  const [contactCount, setContactCount] = useState<number>(
+    startingLevel ?? NAME_RECALL_DEFAULT_CONTACT_COUNT,
+  );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<NameRecallPhase>(
     autoStart ? "study" : "setup",
@@ -101,8 +110,8 @@ export function NameRecall({
   const submissionLocked = useRef(false);
 
   const trial = useMemo(
-    () => generateNameRecallTrial(seed, roundIndex),
-    [roundIndex, seed],
+    () => generateNameRecallTrial(seed, roundIndex, contactCount),
+    [contactCount, roundIndex, seed],
   );
   const targetContact = trial.contacts[trial.targetIndex]!;
 
@@ -220,6 +229,40 @@ export function NameRecall({
                 <i />
               </span>
             ))}
+          </div>
+          <div
+            className="exercise-level-control"
+            role="group"
+            aria-label="People per round"
+          >
+            <span className="exercise-level-label">People per round</span>
+            <div className="digit-span-stepper">
+              <button
+                type="button"
+                aria-label="Fewer people"
+                disabled={contactCount === NAME_RECALL_MIN_CONTACT_COUNT}
+                onClick={() =>
+                  setContactCount((current) => Math.max(NAME_RECALL_MIN_CONTACT_COUNT, current - 1))
+                }
+              >
+                <span aria-hidden="true">−</span>
+              </button>
+              <output aria-live="polite">
+                <strong>{contactCount}</strong>
+                <span>{contactCount === 1 ? "person" : "people"}</span>
+              </output>
+              <button
+                type="button"
+                aria-label="More people"
+                disabled={contactCount === NAME_RECALL_MAX_CONTACT_COUNT}
+                onClick={() =>
+                  setContactCount((current) => Math.min(NAME_RECALL_MAX_CONTACT_COUNT, current + 1))
+                }
+              >
+                <span aria-hidden="true">+</span>
+              </button>
+            </div>
+            <p className="exercise-level-hint">More people means more name bindings to hold at once.</p>
           </div>
           <button
             className="primary-button name-recall-start"

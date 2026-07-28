@@ -6,7 +6,30 @@ import {
   type Seed,
 } from "./sequence";
 
-export const NAME_RECALL_CONTACT_COUNT = 3 as const;
+/**
+ * Contacts held in one session.
+ *
+ * The associative load is the number of face-to-name bindings kept across the
+ * retention gap, so that count is the demand this exercise scales. The ceiling
+ * is bounded by the smaller name pool, since every portrait must take a name
+ * from its matching pool rather than shuffling names and faces independently.
+ */
+export const NAME_RECALL_MIN_CONTACT_COUNT = 3 as const;
+export const NAME_RECALL_MAX_CONTACT_COUNT = 5 as const;
+export const NAME_RECALL_DEFAULT_CONTACT_COUNT = 3 as const;
+
+/** @deprecated Use `NAME_RECALL_DEFAULT_CONTACT_COUNT`. */
+export const NAME_RECALL_CONTACT_COUNT = NAME_RECALL_DEFAULT_CONTACT_COUNT;
+
+export function normalizeNameRecallContactCount(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return NAME_RECALL_DEFAULT_CONTACT_COUNT;
+  }
+  return Math.min(
+    NAME_RECALL_MAX_CONTACT_COUNT,
+    Math.max(NAME_RECALL_MIN_CONTACT_COUNT, Math.round(value)),
+  );
+}
 export const NAME_RECALL_STUDY_MS = 4_500 as const;
 export const NAME_RECALL_RETENTION_MS = 650 as const;
 export const NAME_RECALL_FEEDBACK_MS = 800 as const;
@@ -85,9 +108,13 @@ function shuffle<T>(values: T[], random: () => number): T[] {
 }
 
 function assertTrial(trial: NameRecallTrial): void {
-  if (trial.contacts.length !== NAME_RECALL_CONTACT_COUNT) {
+  if (
+    trial.contacts.length < NAME_RECALL_MIN_CONTACT_COUNT ||
+    trial.contacts.length > NAME_RECALL_MAX_CONTACT_COUNT
+  ) {
     throw new RangeError(
-      `trial must contain ${NAME_RECALL_CONTACT_COUNT} contacts`,
+      `trial must contain between ${NAME_RECALL_MIN_CONTACT_COUNT} and ` +
+        `${NAME_RECALL_MAX_CONTACT_COUNT} contacts`,
     );
   }
   if (
@@ -126,8 +153,10 @@ function assertTrial(trial: NameRecallTrial): void {
 export function generateNameRecallTrial(
   seed: Seed,
   roundIndex: number,
+  contactCount: number = NAME_RECALL_DEFAULT_CONTACT_COUNT,
 ): NameRecallTrial {
   assertRoundIndex(roundIndex);
+  const contactTotal = normalizeNameRecallContactCount(contactCount);
   const normalizedSeed = normalizeSeed(seed);
   const directoryRandom = createSeededRandom(
     hashSeed(`${normalizedSeed}:name-recall:directory:v3`),
@@ -160,20 +189,19 @@ export function generateNameRecallTrial(
   );
   const contacts = shuffle([...directory], contactSetRandom).slice(
     0,
-    NAME_RECALL_CONTACT_COUNT,
+    contactTotal,
   );
   const roundRandom = createSeededRandom(
     hashSeed(`${normalizedSeed}:name-recall:round:${roundIndex}:v4`),
   );
-  const targetOffset = Math.floor(contactSetRandom() * NAME_RECALL_CONTACT_COUNT);
+  const targetOffset = Math.floor(contactSetRandom() * contactTotal);
   const trial: NameRecallTrial = {
     contacts,
     options: shuffle(
       contacts.map((contact) => contact.name),
       roundRandom,
     ),
-    targetIndex:
-      (targetOffset + roundIndex) % NAME_RECALL_CONTACT_COUNT,
+    targetIndex: (targetOffset + roundIndex) % contactTotal,
   };
   assertTrial(trial);
   return trial;

@@ -4,6 +4,9 @@ import {
   VECTOR_MATCH_FEEDBACK_MS,
   evaluateVectorMatchChoice,
   generateVectorMatchTrial,
+  VECTOR_MATCH_DEFAULT_LEVEL,
+  VECTOR_MATCH_MAX_LEVEL,
+  VECTOR_MATCH_MIN_LEVEL,
   type PracticeChargeRoundInput,
   type VectorMatchChoice,
 } from "@brain-training/shared";
@@ -22,6 +25,8 @@ interface VectorMatchResult {
 
 export interface VectorMatchProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onCue?: (target: number) => void;
   onExit: () => void;
@@ -124,8 +129,12 @@ export function VectorMatch({
   onCue,
   onExit,
   onFeedback,
+  startingLevel,
 }: VectorMatchProps) {
   const [seed, setSeed] = useState(createSeed);
+  const [disparityLevel, setDisparityLevel] = useState<number>(
+    startingLevel ?? VECTOR_MATCH_DEFAULT_LEVEL,
+  );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<VectorMatchPhase>(
     autoStart ? "play" : "setup",
@@ -142,8 +151,8 @@ export function VectorMatch({
   const completionReported = useRef(false);
 
   const trial = useMemo(
-    () => generateVectorMatchTrial(seed, roundIndex),
-    [roundIndex, seed],
+    () => generateVectorMatchTrial(seed, roundIndex, disparityLevel),
+    [disparityLevel, roundIndex, seed],
   );
 
   useEffect(() => {
@@ -256,6 +265,40 @@ export function VectorMatch({
               rotation={108}
               shapeIndex={2}
             />
+          </div>
+          <div
+            className="exercise-level-control"
+            role="group"
+            aria-label="Rotation difficulty"
+          >
+            <span className="exercise-level-label">Rotation difficulty</span>
+            <div className="digit-span-stepper">
+              <button
+                type="button"
+                aria-label="Reduce rotation difficulty"
+                disabled={disparityLevel === VECTOR_MATCH_MIN_LEVEL}
+                onClick={() =>
+                  setDisparityLevel((current) => Math.max(VECTOR_MATCH_MIN_LEVEL, current - 1))
+                }
+              >
+                <span aria-hidden="true">−</span>
+              </button>
+              <output aria-live="polite">
+                <strong>{disparityLevel}</strong>
+                <span>{disparityLevel === 1 ? "level" : "levels"}</span>
+              </output>
+              <button
+                type="button"
+                aria-label="Increase rotation difficulty"
+                disabled={disparityLevel === VECTOR_MATCH_MAX_LEVEL}
+                onClick={() =>
+                  setDisparityLevel((current) => Math.min(VECTOR_MATCH_MAX_LEVEL, current + 1))
+                }
+              >
+                <span aria-hidden="true">+</span>
+              </button>
+            </div>
+            <p className="exercise-level-hint">A wider angle between the figures is harder to resolve.</p>
           </div>
           <button
             className="vector-match-start"

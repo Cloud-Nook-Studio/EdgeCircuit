@@ -175,6 +175,17 @@ The interface is not a keypad, dashboard grid, arcade cabinet, or collection of
 decorative cards. Elements should feel placed in space, with generous negative
 space and a clear center of attention.
 
+This applies to the exercises themselves, not only the home field. An exercise
+renders directly on the construction field: no rounded panel, no border, no
+shadow plate, and no reserved minimum height holding empty space open. The
+constellation, digit string, or comparison figure is the only object on screen,
+and its supporting controls sit in space around it. Controls belong to the same
+faceted family as the nodes — the primary action and the setup steppers take
+the shallow corner bevel, and status rows resolve onto one baseline under a
+single hairline rule. Where a shape is bevelled, its fill defines the
+silhouette: a `clip-path` cuts any border along with the box and leaves the
+diagonal corner visibly torn open, so bevelled elements carry no stroke.
+
 ## Surface and color
 
 - Near-black navy creates depth without looking black.
@@ -190,7 +201,16 @@ space and a clear center of attention.
   field. It should orient the composition without becoming graph paper.
 - In light mode, playable vector shells remain exposed directly on the field.
   Never place an opaque or translucent rectangular backing behind their clipped
-  blueprint geometry.
+  blueprint geometry. A heavy near-black `drop-shadow` on the blueprint SVG
+  counts as a backing: on paper it prints exactly the grey plate this rule
+  forbids. Light mode uses a shadow tight and cool enough to read as lift.
+- The light field is warm paper, not cool grey, so restrained gold stays gold
+  instead of turning muddy against it.
+- Every theme is a shipping theme. Light mode once rendered each game's first
+  word and both metric labels near-white on near-white — roughly 1.05:1, and
+  invisible. Any copy colour introduced late in the cascade must state its
+  light-theme counterpart at a specificity that survives, and both themes are
+  checked for contrast before a change is considered done.
 - Pulse Path polygons and the EdgeCircuit mark use translucent mineral bodies and layered blueprint
   traces. Combine a solid perimeter, dashed offset contour, solid brace, and
   dotted guide at distinct low-contrast weights. Avoid opaque icon blocks,
@@ -204,9 +224,23 @@ space and a clear center of attention.
 
 ## Type and language
 
-- Major moments may use an editorial serif with authority and warmth.
-- Controls and metrics use a compact, highly legible sans serif.
+- Major moments use **Newsreader**, an editorial serif whose sharp wedge
+  serifs and optical sizing read as engineered rather than bookish. It carries
+  screen headlines, game titles, and the hub's initiation label.
+- Controls, metrics, eyebrows, and instruction use **Inter**, a precise
+  neo-grotesk. Metrics set tabular figures so readouts hold their column.
+- Both families are self-hosted as `woff2` in `apps/web/src/fonts/` and pass
+  through the bundler's asset pipeline, so they are fingerprinted, resolve
+  under any deploy base path, and make no third-party request. Never reintroduce
+  a web-safe fallback stack as the primary face: the product rendered in Georgia
+  and Segoe UI for its first iteration and read a decade older than its own
+  geometry.
+- Reference the `--font-serif`, `--font-sans`, and `--font-mono` tokens rather
+  than naming a family inline, so the pair can be changed in one place.
 - Monospace is reserved for digit strings or genuinely technical readouts.
+- One headline slot means one treatment. Setup titles and in-exercise phase
+  titles are the same moment and take the same serif at the same restrained
+  scale; the task itself always outranks its own label.
 - Copy is brief, direct, and composed. Never sound breathless, gamified, or
   clinical.
 - The home screen has no marketing headline. Do not add “Sharpen your edge,”
@@ -347,7 +381,8 @@ different from rotation. Report only performance on this task, never spatial
 intelligence, general reasoning, or cognitive-health claims.
 
 Trace Pair is a three-round relational-matching exercise. Each round presents
-six open blueprint assemblies around a loose circular constellation, with one
+four to eight open blueprint assemblies around a loose circular constellation,
+six by default, with one
 quiet radial spoke from each assembly to a central junction. Exactly two share
 the same internal connection topology while their outer frames, datum marks,
 and rotations differ. The player selects those two assemblies directly; there
@@ -361,8 +396,8 @@ green with a restrained gold transition.
 Report only pair-selection accuracy and response pace on this task.
 
 Name Recall is a three-round associative-memory exercise. Each round presents
-three distinct, recognizably human professional portraits paired with first
-names for 4.5 seconds. Faces use consistent framing and lighting while retaining
+three to five distinct, recognizably human professional portraits paired with
+first names for 4.5 seconds, three by default. Faces use consistent framing and lighting while retaining
 clear differences in age, features, hair, and presentation; never substitute
 abstract geometric identity glyphs. After a 650-millisecond blank retention beat, one identity returns and
 the player selects its associated name from the same three-name set. The entire
@@ -425,3 +460,42 @@ Before adding a visual element, ask:
 3. Would the screen feel less intelligent if it were removed?
 
 If the answer is no, remove it.
+
+## Progress and adaptation
+
+Each completed session is kept as one timestamped observation for that
+exercise. A game node may carry one restrained trend mark beside its success
+readout, and only once there are enough real observations on both sides of the
+comparison to support a direction — a single strong session never renders as an
+upward trend. Muted green marks an improving trend, consistent with its reserved
+meaning; a declining trend stays deliberately quiet in steel rather than reading
+as an alarm. The product never attaches loss anxiety to a measure.
+
+Difficulty is fixed within a session and adapts between sessions toward a
+70–85% success band. Advancing requires a sustained window; easing happens
+immediately after a session that was clear overload. This asymmetry is
+intentional: the product would rather understate a player's level than pressure
+them to repeat a demand they could not hold.
+
+These readouts describe performance on the named exercise. Never present a
+trend, a best level, or a success band as evidence of intelligence, general
+memory, executive ability, workplace readiness, or cognitive health.
+
+## Setup and demand
+
+Every exercise opens on a setup screen that exposes the one dimension it
+scales, using the same beveled stepper in the same position. The label names
+what the number changes — **Assemblies per round**, **People per round**,
+**Rotation difficulty**, **Interference** — never a bare "difficulty", and a
+single quiet line explains what raising it does. The control is a preference,
+not a score: nothing about it implies a level reached or a rank earned.
+
+The chosen level holds for all three rounds. Between sessions the engine may
+recommend a different opening level, and the setup screen simply opens there;
+the player can always override it before starting.
+
+A dimension must be the thing that genuinely makes the task harder, not the
+thing easiest to vary. Adding decoration, shortening a timer, or crowding the
+field with noise are not difficulty. More assemblies to compare, more bindings
+to hold, a wider angle to resolve, and more rounds where the ignored attribute
+competes all are.

@@ -30,6 +30,8 @@ interface CompletedRound extends NumberRecallResult {
 
 interface NumberMemoryProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onExit: () => void;
   onFeedback: (round: PracticeChargeRoundInput) => void;
@@ -49,10 +51,11 @@ export function NumberMemory({
   onExit,
   onFeedback,
   onPresent,
+  startingLevel,
 }: NumberMemoryProps) {
   const [seed, setSeed] = useState(createSeed);
   const [digitLength, setDigitLength] = useState<number>(
-    NUMBER_MEMORY_DEFAULT_LENGTH,
+    startingLevel ?? NUMBER_MEMORY_DEFAULT_LENGTH,
   );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<NumberPhase>(

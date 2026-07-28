@@ -626,9 +626,15 @@ test("home screen fits its viewport and exposes theme and sound preferences", as
     "background-color",
     "rgba(0, 0, 0, 0)",
   );
-  expect(
-    await page.locator("body").evaluate((node) => getComputedStyle(node).backgroundImage),
-  ).toContain("44, 79, 102");
+  // The light field keeps quiet slate construction lines over paper. Assert the
+  // grid is drawn rather than pinning an exact tone, so retuning the surface
+  // does not require editing this test.
+  const lightField = await page
+    .locator("body")
+    .evaluate((node) => getComputedStyle(node).backgroundImage);
+  expect(lightField).toContain("rgba(58, 88, 112");
+  expect(await page.locator("body").evaluate((node) => getComputedStyle(node).backgroundSize))
+    .toContain("48px 48px");
 
   await expectNoHorizontalOverflow(page);
   await page.reload();
@@ -2313,15 +2319,29 @@ test("Trace Pair completes three structural matches and updates the daily orbit"
     ),
   );
   expect(playedGames?.games).toContain("trace-pair");
-  const tracePerformance = await page.evaluate(() => {
+  // The session is kept as one timestamped observation, so accuracy can later
+  // be read as a trend rather than only as a running mean.
+  const traceProgress = await page.evaluate(() => {
     const stored = JSON.parse(
-      localStorage.getItem("brain-training:game-performance:v1") ?? "{}",
-    ) as Record<string, { accuracyTotal?: number; sessions?: number }>;
+      localStorage.getItem("brain-training:game-progress:v1") ?? "{}",
+    ) as Record<
+      string,
+      {
+        observations?: Array<{
+          accuracy?: number;
+          completedAt?: string;
+          totalRounds?: number;
+        }>;
+      }
+    >;
     return stored["trace-pair"];
   });
-  expect(tracePerformance?.sessions).toBe(1);
-  expect(tracePerformance?.accuracyTotal).toBeGreaterThanOrEqual(0);
-  expect(tracePerformance?.accuracyTotal).toBeLessThanOrEqual(1);
+  expect(traceProgress?.observations).toHaveLength(1);
+  const traceSession = traceProgress?.observations?.[0];
+  expect(traceSession?.accuracy).toBeGreaterThanOrEqual(0);
+  expect(traceSession?.accuracy).toBeLessThanOrEqual(1);
+  expect(traceSession?.totalRounds).toBe(3);
+  expect(Number.isNaN(Date.parse(traceSession?.completedAt ?? ""))).toBe(false);
   await page.reload();
   await expect(
     page.locator(
@@ -2539,7 +2559,7 @@ test("pulse path forms drift from fixed radial anchors", async ({ page }) => {
   ).toBeGreaterThan(2);
 });
 
-test("a completed fixed-length session is durable and setup defaults to three", async ({
+test("a completed fixed-length session is durable and setup eases after overload", async ({
   page,
 }) => {
   await page.clock.install();
@@ -2581,8 +2601,10 @@ test("a completed fixed-length session is durable and setup defaults to three", 
   await expect(
     page.getByRole("heading", { name: "Choose your path length" }),
   ).toBeVisible();
+  // Every round above was missed, so the engine eases one step from 5 rather
+  // than forgetting the level entirely or asking for a repeat of the overload.
   await expect(page.locator(".digit-span-stepper output strong")).toHaveText(
-    "3",
+    "4",
   );
   await page.getByRole("button", { name: /Start 3 rounds/i }).click();
 
@@ -2599,7 +2621,8 @@ test("a completed fixed-length session is durable and setup defaults to three", 
         }
       : null;
   });
-  expect(nextSession).toEqual({ adaptive: false, startingLevel: 3 });
+  // Level stays fixed within a session; adaptation happens only between them.
+  expect(nextSession).toEqual({ adaptive: false, startingLevel: 4 });
 });
 
 test("the constellation stays stable within a round and fully remaps between rounds", async ({

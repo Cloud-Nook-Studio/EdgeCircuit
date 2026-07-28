@@ -3,6 +3,34 @@ import type { Seed } from "./sequence";
 
 export const RULE_SHIFT_FEEDBACK_MS = 800 as const;
 
+/**
+ * Interference level.
+ *
+ * A trial is *incongruent* when the signal's position and its arrow disagree,
+ * so the ignored attribute actively competes with the active rule. Congruent
+ * trials need no interference control at all. The level therefore sets how
+ * many of the session's rounds are incongruent, which is the demand this
+ * exercise scales — not how fast the answer must arrive.
+ */
+export const RULE_SHIFT_MIN_LEVEL = 1 as const;
+export const RULE_SHIFT_MAX_LEVEL = 4 as const;
+export const RULE_SHIFT_DEFAULT_LEVEL = 3 as const;
+
+export function normalizeRuleShiftLevel(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return RULE_SHIFT_DEFAULT_LEVEL;
+  }
+  return Math.min(
+    RULE_SHIFT_MAX_LEVEL,
+    Math.max(RULE_SHIFT_MIN_LEVEL, Math.round(value)),
+  );
+}
+
+/** Incongruent rounds for a level: level 1 has none, level 4 has all three. */
+export function getRuleShiftIncongruentRounds(level: number): number {
+  return normalizeRuleShiftLevel(level) - 1;
+}
+
 export type HorizontalChoice = "left" | "right";
 export type RuleShiftRule = "direction" | "position";
 
@@ -50,6 +78,7 @@ function createRandom(seed: number): () => number {
 export function generateRuleShiftTrial(
   seed: Seed,
   roundIndex: number,
+  level: number = RULE_SHIFT_DEFAULT_LEVEL,
 ): RuleShiftTrial {
   assertRoundIndex(roundIndex);
 
@@ -64,11 +93,39 @@ export function generateRuleShiftTrial(
     hash(`${String(seed)}:rule-shift:${roundIndex}`),
   );
 
+  /*
+   * Choose which rounds carry interference from the session seed, so the count
+   * is exact rather than left to chance across only three rounds.
+   */
+  const incongruentCount = getRuleShiftIncongruentRounds(level);
+  const roundOrder = Array.from({ length: TOTAL_ROUNDS }, (_, index) => index);
+  const orderRandom = createRandom(hash(`${String(seed)}:rule-shift:congruency`));
+  for (let index = roundOrder.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(orderRandom() * (index + 1));
+    [roundOrder[index], roundOrder[swapIndex]] = [
+      roundOrder[swapIndex]!,
+      roundOrder[index]!,
+    ];
+  }
+  const incongruent = roundOrder.slice(0, incongruentCount).includes(roundIndex);
+
+  const direction: HorizontalChoice = trialRandom() >= 0.5 ? "right" : "left";
+  const position: HorizontalChoice = incongruent
+    ? direction === "right"
+      ? "left"
+      : "right"
+    : direction;
+
   return {
-    direction: trialRandom() >= 0.5 ? "right" : "left",
-    position: trialRandom() >= 0.5 ? "right" : "left",
+    direction,
+    position,
     rule: ruleIndex === 0 ? "direction" : "position",
   };
+}
+
+/** True when the ignored attribute competes with the active rule. */
+export function isRuleShiftTrialIncongruent(trial: RuleShiftTrial): boolean {
+  return trial.direction !== trial.position;
 }
 
 export function getRuleShiftAnswer(

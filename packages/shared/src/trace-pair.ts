@@ -6,7 +6,35 @@ import {
   type Seed,
 } from "./sequence";
 
-export const TRACE_PAIR_OPTION_COUNT = 6 as const;
+/**
+ * Candidate field size. More assemblies means more pairwise topology
+ * comparisons to hold before answering, which is the demand this exercise
+ * actually scales. The step is two so the constellation stays balanced, and
+ * the ceiling is bounded by the topology library: one matching topology plus
+ * `optionCount - 2` distinct distractors must fit inside it.
+ */
+export const TRACE_PAIR_MIN_OPTION_COUNT = 4 as const;
+export const TRACE_PAIR_MAX_OPTION_COUNT = 8 as const;
+export const TRACE_PAIR_OPTION_COUNT_STEP = 2 as const;
+export const TRACE_PAIR_DEFAULT_OPTION_COUNT = 6 as const;
+
+/** @deprecated Use `TRACE_PAIR_DEFAULT_OPTION_COUNT`. */
+export const TRACE_PAIR_OPTION_COUNT = TRACE_PAIR_DEFAULT_OPTION_COUNT;
+
+export function normalizeTracePairOptionCount(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return TRACE_PAIR_DEFAULT_OPTION_COUNT;
+  }
+  const steps = Math.round(
+    (value - TRACE_PAIR_MIN_OPTION_COUNT) / TRACE_PAIR_OPTION_COUNT_STEP,
+  );
+  const snapped =
+    TRACE_PAIR_MIN_OPTION_COUNT + steps * TRACE_PAIR_OPTION_COUNT_STEP;
+  return Math.min(
+    TRACE_PAIR_MAX_OPTION_COUNT,
+    Math.max(TRACE_PAIR_MIN_OPTION_COUNT, snapped),
+  );
+}
 export const TRACE_PAIR_FEEDBACK_MS = 800 as const;
 export const TRACE_PAIR_TOPOLOGY_COUNT = 8 as const;
 
@@ -45,9 +73,17 @@ function shuffle<T>(values: T[], random: () => number): void {
 }
 
 function assertTrial(trial: TracePairTrial): void {
-  if (trial.options.length !== TRACE_PAIR_OPTION_COUNT) {
+  if (
+    trial.options.length < TRACE_PAIR_MIN_OPTION_COUNT ||
+    trial.options.length > TRACE_PAIR_MAX_OPTION_COUNT ||
+    (trial.options.length - TRACE_PAIR_MIN_OPTION_COUNT) %
+      TRACE_PAIR_OPTION_COUNT_STEP !==
+      0
+  ) {
     throw new RangeError(
-      `trial must contain exactly ${TRACE_PAIR_OPTION_COUNT} options`,
+      `trial must contain between ${TRACE_PAIR_MIN_OPTION_COUNT} and ` +
+        `${TRACE_PAIR_MAX_OPTION_COUNT} options in steps of ` +
+        `${TRACE_PAIR_OPTION_COUNT_STEP}`,
     );
   }
   const [firstAnswer, secondAnswer] = trial.answerIndices;
@@ -86,8 +122,10 @@ function assertTrial(trial: TracePairTrial): void {
 export function generateTracePairTrial(
   seed: Seed,
   roundIndex: number,
+  optionCount: number = TRACE_PAIR_DEFAULT_OPTION_COUNT,
 ): TracePairTrial {
   assertRoundIndex(roundIndex);
+  const options = normalizeTracePairOptionCount(optionCount);
   const normalizedSeed = normalizeSeed(seed);
   const random = createSeededRandom(
     hashSeed(`${normalizedSeed}:trace-pair:${roundIndex}:v1`),
@@ -104,7 +142,7 @@ export function generateTracePairTrial(
   const topologies = [
     matchingTopology,
     matchingTopology,
-    ...distractorTopologies.slice(0, TRACE_PAIR_OPTION_COUNT - 2),
+    ...distractorTopologies.slice(0, options - 2),
   ];
   const firstRotation = Math.floor(random() * 8) * 45;
   const candidates = topologies.map<TracePairCandidate>(

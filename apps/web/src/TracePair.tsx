@@ -4,6 +4,10 @@ import {
   TRACE_PAIR_FEEDBACK_MS,
   evaluateTracePairChoice,
   generateTracePairTrial,
+  TRACE_PAIR_DEFAULT_OPTION_COUNT,
+  TRACE_PAIR_MAX_OPTION_COUNT,
+  TRACE_PAIR_MIN_OPTION_COUNT,
+  TRACE_PAIR_OPTION_COUNT_STEP,
   type PracticeChargeRoundInput,
   type TracePairCandidate,
 } from "@brain-training/shared";
@@ -21,6 +25,8 @@ interface TracePairRoundResult {
 
 interface TracePairProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onCue?: (target: number) => void;
   onExit: () => void;
@@ -123,8 +129,12 @@ export function TracePair({
   onCue,
   onExit,
   onFeedback,
+  startingLevel,
 }: TracePairProps) {
   const [seed, setSeed] = useState(createSeed);
+  const [optionCount, setOptionCount] = useState<number>(
+    startingLevel ?? TRACE_PAIR_DEFAULT_OPTION_COUNT,
+  );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<TracePairPhase>(
     autoStart ? "play" : "setup",
@@ -140,8 +150,8 @@ export function TracePair({
   const completionReported = useRef(false);
 
   const trial = useMemo(
-    () => generateTracePairTrial(seed, roundIndex),
-    [roundIndex, seed],
+    () => generateTracePairTrial(seed, roundIndex, optionCount),
+    [optionCount, roundIndex, seed],
   );
 
   useEffect(() => {
@@ -250,9 +260,43 @@ export function TracePair({
             <i />
             <span />
           </div>
+          <div
+            className="exercise-level-control"
+            role="group"
+            aria-label="Assemblies per round"
+          >
+            <span className="exercise-level-label">Assemblies per round</span>
+            <div className="digit-span-stepper">
+              <button
+                type="button"
+                aria-label="Fewer assemblies"
+                disabled={optionCount === TRACE_PAIR_MIN_OPTION_COUNT}
+                onClick={() =>
+                  setOptionCount((current) => Math.max(TRACE_PAIR_MIN_OPTION_COUNT, current - TRACE_PAIR_OPTION_COUNT_STEP))
+                }
+              >
+                <span aria-hidden="true">−</span>
+              </button>
+              <output aria-live="polite">
+                <strong>{optionCount}</strong>
+                <span>{optionCount === 1 ? "assembly" : "assemblies"}</span>
+              </output>
+              <button
+                type="button"
+                aria-label="More assemblies"
+                disabled={optionCount === TRACE_PAIR_MAX_OPTION_COUNT}
+                onClick={() =>
+                  setOptionCount((current) => Math.min(TRACE_PAIR_MAX_OPTION_COUNT, current + TRACE_PAIR_OPTION_COUNT_STEP))
+                }
+              >
+                <span aria-hidden="true">+</span>
+              </button>
+            </div>
           <p className="trace-pair-task-note">
             Results describe performance on this matching task.
           </p>
+            <p className="exercise-level-hint">More assemblies means more pairs to compare before answering.</p>
+          </div>
           <button
             className="trace-pair-start"
             type="button"

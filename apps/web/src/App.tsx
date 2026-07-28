@@ -12,12 +12,21 @@ import {
 import {
   MAX_LEVEL,
   MIN_LEVEL,
+  NUMBER_MEMORY_DEFAULT_LENGTH,
+  NUMBER_MEMORY_MAX_LENGTH,
+  NUMBER_MEMORY_MIN_LENGTH,
+  NAME_RECALL_DEFAULT_CONTACT_COUNT,
+  NAME_RECALL_MAX_CONTACT_COUNT,
+  NAME_RECALL_MIN_CONTACT_COUNT,
   PERSISTENCE_KEY,
   TOTAL_ROUNDS,
   calculateCorrectPrefix,
   calculateDailyPracticeCharge,
   calculatePracticeChargeAward,
   completeRound,
+  appendObservation,
+  createGameProgress,
+  createObservation,
   createPersistenceEnvelope,
   createSession,
   generateConstellation,
@@ -26,10 +35,30 @@ import {
   getCurrentSequence,
   getConstellationTargetLabel,
   isDailyBadgeId,
+  migrateLegacyPerformance,
+  parseGameProgress,
   parsePersistenceEnvelope,
   qualifiesForDailyGameClear,
+  recommendNextLevel,
+  RULE_SHIFT_DEFAULT_LEVEL,
+  RULE_SHIFT_MAX_LEVEL,
+  RULE_SHIFT_MIN_LEVEL,
+  SIGNAL_SWEEP_DEFAULT_OPTION_COUNT,
+  SIGNAL_SWEEP_MAX_OPTION_COUNT,
+  SIGNAL_SWEEP_MIN_OPTION_COUNT,
+  SIGNAL_SWEEP_OPTION_COUNT_STEP,
+  TRACE_PAIR_DEFAULT_OPTION_COUNT,
+  TRACE_PAIR_MAX_OPTION_COUNT,
+  TRACE_PAIR_MIN_OPTION_COUNT,
+  TRACE_PAIR_OPTION_COUNT_STEP,
+  VECTOR_MATCH_DEFAULT_LEVEL,
+  VECTOR_MATCH_MAX_LEVEL,
+  VECTOR_MATCH_MIN_LEVEL,
+  summarizeProgress,
   summarizeSession,
   type DailyBadgeId,
+  type GameProgress,
+  type ProgressSummary,
   type PersistenceEnvelopeV1,
   type PracticeChargeAward,
   type PracticeChargeRoundInput,
@@ -55,9 +84,86 @@ const PRACTICE_CHARGE_KEY = "brain-training:practice-charge:v2";
 const LEGACY_PRACTICE_CHARGE_KEY = "mentavault:practice-charge:v1";
 const DAILY_CLEARS_KEY = "brain-training:daily-clears:v2";
 const GAME_PERFORMANCE_KEY = "brain-training:game-performance:v1";
+const GAME_PROGRESS_KEY = "brain-training:game-progress:v1";
+const GAME_LEVELS_KEY = "brain-training:game-levels:v1";
 const CIRCUIT_GAMES_KEY = "brain-training:circuit-games:v1";
 const CIRCUIT_POSITIONS_KEY = "brain-training:circuit-positions:v1";
 const DEFAULT_PATH_LENGTH = 3;
+
+/**
+ * The exercises that expose a scalable demand, and the range that demand may
+ * move through between sessions. `step` matters for Signal Sweep, whose
+ * candidate field only exists at even counts; a recommendation is snapped onto
+ * the step so adaptation can never request an unbuildable trial.
+ *
+ * Every implemented exercise now carries a demand that can move, so all seven
+ * take part in adaptation.
+ */
+const GAME_LEVEL_BOUNDS: Partial<
+  Record<GameId, { min: number; max: number; step: number; defaultLevel: number }>
+> = {
+  "pulse-path": {
+    min: MIN_LEVEL,
+    max: MAX_LEVEL,
+    step: 1,
+    defaultLevel: DEFAULT_PATH_LENGTH,
+  },
+  "number-memory": {
+    min: NUMBER_MEMORY_MIN_LENGTH,
+    max: NUMBER_MEMORY_MAX_LENGTH,
+    step: 1,
+    defaultLevel: NUMBER_MEMORY_DEFAULT_LENGTH,
+  },
+  "signal-sweep": {
+    min: SIGNAL_SWEEP_MIN_OPTION_COUNT,
+    max: SIGNAL_SWEEP_MAX_OPTION_COUNT,
+    step: SIGNAL_SWEEP_OPTION_COUNT_STEP,
+    defaultLevel: SIGNAL_SWEEP_DEFAULT_OPTION_COUNT,
+  },
+  "trace-pair": {
+    min: TRACE_PAIR_MIN_OPTION_COUNT,
+    max: TRACE_PAIR_MAX_OPTION_COUNT,
+    step: TRACE_PAIR_OPTION_COUNT_STEP,
+    defaultLevel: TRACE_PAIR_DEFAULT_OPTION_COUNT,
+  },
+  "vector-match": {
+    min: VECTOR_MATCH_MIN_LEVEL,
+    max: VECTOR_MATCH_MAX_LEVEL,
+    step: 1,
+    defaultLevel: VECTOR_MATCH_DEFAULT_LEVEL,
+  },
+  "rule-shift": {
+    min: RULE_SHIFT_MIN_LEVEL,
+    max: RULE_SHIFT_MAX_LEVEL,
+    step: 1,
+    defaultLevel: RULE_SHIFT_DEFAULT_LEVEL,
+  },
+  "name-recall": {
+    min: NAME_RECALL_MIN_CONTACT_COUNT,
+    max: NAME_RECALL_MAX_CONTACT_COUNT,
+    step: 1,
+    defaultLevel: NAME_RECALL_DEFAULT_CONTACT_COUNT,
+  },
+};
+
+/** Snaps a recommended level onto the exercise's legal step. */
+function snapToStep(
+  value: number,
+  bounds: { min: number; max: number; step: number },
+): number {
+  const steps = Math.round((value - bounds.min) / bounds.step);
+  return Math.min(bounds.max, Math.max(bounds.min, bounds.min + steps * bounds.step));
+}
+
+/** The level an exercise should open at, honouring what the engine recommends. */
+function startingLevelFor(
+  game: GameId,
+  levels: Partial<Record<GameId, number>>,
+): number | null {
+  const bounds = GAME_LEVEL_BOUNDS[game];
+  if (!bounds) return null;
+  return snapToStep(levels[game] ?? bounds.defaultLevel, bounds);
+}
 
 type Phase =
   | "home"
@@ -214,6 +320,7 @@ interface GamePerformance {
 }
 
 type GamePerformanceMap = Partial<Record<GameId, GamePerformance>>;
+type GameProgressMap = Partial<Record<GameId, GameProgress>>;
 
 const EMPTY_GAME_PERFORMANCE: GamePerformance = {
   accuracyTotal: 0,
@@ -598,43 +705,83 @@ function loadPlayedGames(): PlayedGamesState {
   };
 }
 
-function loadGamePerformance(): GamePerformanceMap {
-  const saved = safeJsonParse(safeStorageGet(GAME_PERFORMANCE_KEY));
+/**
+ * Reads per-game progress, upgrading the previous running-mean record on first
+ * load. The old `{ accuracyTotal, sessions }` totals are carried across as
+ * legacy counts, so a returning player's play count and mean success are
+ * unchanged by the upgrade while trends start accumulating from real sessions.
+ */
+function loadGameProgress(): GameProgressMap {
+  const progress: GameProgressMap = {};
+  const saved = safeJsonParse(safeStorageGet(GAME_PROGRESS_KEY));
+
+  if (saved && typeof saved === "object") {
+    const record = saved as Record<string, unknown>;
+    for (const game of ALL_GAME_IDS) {
+      if (record[game] === undefined) continue;
+      progress[game] = parseGameProgress(record[game]);
+    }
+    return progress;
+  }
+
+  const legacy = safeJsonParse(safeStorageGet(GAME_PERFORMANCE_KEY));
+  if (legacy && typeof legacy === "object") {
+    const record = legacy as Record<string, unknown>;
+    for (const game of ALL_GAME_IDS) {
+      if (record[game] === undefined) continue;
+      const migrated = migrateLegacyPerformance(record[game]);
+      if (migrated.legacySessions > 0) progress[game] = migrated;
+    }
+
+    // Persist the upgrade immediately so it survives even if the player never
+    // finishes another session, and so the legacy read can eventually retire.
+    if (Object.keys(progress).length > 0) saveGameProgress(progress);
+  }
+
+  return progress;
+}
+
+function saveGameProgress(progress: GameProgressMap): void {
+  try {
+    localStorage.setItem(GAME_PROGRESS_KEY, JSON.stringify(progress));
+  } catch {
+    // Progress remains available for the current visit.
+  }
+}
+
+/**
+ * The orbital nodes still read a play count and a mean, so keep deriving that
+ * shape rather than teaching every node about observations.
+ */
+function toGamePerformance(progress: GameProgress): GamePerformance {
+  const summary = summarizeProgress(progress);
+  return {
+    accuracyTotal: (summary.meanAccuracy ?? 0) * summary.sessions,
+    sessions: summary.sessions,
+  };
+}
+
+function loadGameLevels(): Partial<Record<GameId, number>> {
+  const saved = safeJsonParse(safeStorageGet(GAME_LEVELS_KEY));
   if (!saved || typeof saved !== "object") return {};
 
-  const performance: GamePerformanceMap = {};
+  const levels: Partial<Record<GameId, number>> = {};
   const record = saved as Record<string, unknown>;
   for (const game of ALL_GAME_IDS) {
     const value = record[game];
-    if (!value || typeof value !== "object") continue;
-
-    const candidate = value as Record<string, unknown>;
-    if (
-      typeof candidate.sessions === "number" &&
-      Number.isInteger(candidate.sessions) &&
-      candidate.sessions >= 0 &&
-      typeof candidate.accuracyTotal === "number" &&
-      Number.isFinite(candidate.accuracyTotal) &&
-      candidate.accuracyTotal >= 0
-    ) {
-      performance[game] = {
-        accuracyTotal: Math.min(
-          candidate.sessions,
-          candidate.accuracyTotal,
-        ),
-        sessions: candidate.sessions,
-      };
+    if (typeof value === "number" && Number.isFinite(value)) {
+      levels[game] = Math.round(value);
     }
   }
 
-  return performance;
+  return levels;
 }
 
-function saveGamePerformance(performance: GamePerformanceMap): void {
+function saveGameLevels(levels: Partial<Record<GameId, number>>): void {
   try {
-    localStorage.setItem(GAME_PERFORMANCE_KEY, JSON.stringify(performance));
+    localStorage.setItem(GAME_LEVELS_KEY, JSON.stringify(levels));
   } catch {
-    // Performance badges remain available for the current visit.
+    // The chosen level remains available for the current visit.
   }
 }
 
@@ -908,7 +1055,24 @@ function App() {
   const [practiceCharge, setPracticeCharge] = useState(loadPracticeCharge);
   const [playedGames, setPlayedGames] = useState(loadPlayedGames);
   const [circuitGames, setCircuitGames] = useState(loadCircuitGames);
-  const [gamePerformance, setGamePerformance] = useState(loadGamePerformance);
+  const [gameProgress, setGameProgress] = useState(loadGameProgress);
+  const [gameLevels, setGameLevels] = useState(loadGameLevels);
+  const progressSummaries = useMemo<Partial<Record<GameId, ProgressSummary>>>(() => {
+    const summaries: Partial<Record<GameId, ProgressSummary>> = {};
+    for (const game of ALL_GAME_IDS) {
+      const progress = gameProgress[game];
+      if (progress) summaries[game] = summarizeProgress(progress);
+    }
+    return summaries;
+  }, [gameProgress]);
+  const gamePerformance = useMemo<GamePerformanceMap>(() => {
+    const derived: GamePerformanceMap = {};
+    for (const game of ALL_GAME_IDS) {
+      const progress = gameProgress[game];
+      if (progress) derived[game] = toGamePerformance(progress);
+    }
+    return derived;
+  }, [gameProgress]);
   const [phase, setPhase] = useState<Phase>(
     initialAppState.recoveredSummary ? "summary" : "home",
   );
@@ -929,7 +1093,9 @@ function App() {
     initialAppState.recoveredSummary,
   );
   const [pathLength, setPathLength] = useState(
-    initialAppState.recoveredSummary?.startingLevel ?? DEFAULT_PATH_LENGTH,
+    initialAppState.recoveredSummary?.startingLevel ??
+      startingLevelFor("pulse-path", loadGameLevels()) ??
+      DEFAULT_PATH_LENGTH,
   );
   const [announcement, setAnnouncement] = useState(
     initialAppState.recoveredSummary
@@ -939,8 +1105,8 @@ function App() {
   const firstRecallTile = useRef<HTMLButtonElement>(null);
   const recallStartedAt = useRef<number | null>(null);
   const roundLocked = useRef(false);
-  const trackedRoundAccuracy = useRef<
-    Partial<Record<GameId, number[]>>
+  const trackedRounds = useRef<
+    Partial<Record<GameId, PracticeChargeRoundInput[]>>
   >({});
   const constellation = useMemo(
     () =>
@@ -1062,23 +1228,61 @@ function App() {
     [],
   );
 
-  const recordGamePerformance = useCallback(
-    (game: GameId, sessionAccuracy: number) => {
-      setGamePerformance((current) => {
-        const previous = current[game] ?? {
-          accuracyTotal: 0,
-          sessions: 0,
-        };
-        const next: GamePerformanceMap = {
+  /**
+   * Records one completed session as a timestamped observation, then lets the
+   * engine recommend the level this exercise should open at next time. The
+   * level only ever moves between sessions: within a session the demand stays
+   * fixed so the round has one clear cognitive load.
+   */
+  const recordGameSession = useCallback(
+    (
+      game: GameId,
+      session: {
+        accuracy: number;
+        level: number | null;
+        exactRounds: number;
+        totalRounds: number;
+        meanResponseMs: number | null;
+      },
+    ) => {
+      const observation = createObservation({
+        id: `${game}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`,
+        completedAt: new Date().toISOString(),
+        accuracy: session.accuracy,
+        level: session.level,
+        exactRounds: session.exactRounds,
+        totalRounds: session.totalRounds,
+        meanResponseMs: session.meanResponseMs,
+      });
+      if (observation === null) return;
+
+      setGameProgress((current) => {
+        const previous = current[game] ?? createGameProgress();
+        const next: GameProgressMap = {
           ...current,
-          [game]: {
-            accuracyTotal:
-              previous.accuracyTotal +
-              Math.min(1, Math.max(0, sessionAccuracy)),
-            sessions: previous.sessions + 1,
-          },
+          [game]: appendObservation(previous, observation),
         };
-        saveGamePerformance(next);
+        saveGameProgress(next);
+
+        const bounds = GAME_LEVEL_BOUNDS[game];
+        if (bounds && session.level !== null) {
+          const recommended = snapToStep(
+            recommendNextLevel({
+              progress: next[game] ?? createGameProgress(),
+              currentLevel: session.level,
+              minLevel: bounds.min,
+              maxLevel: bounds.max,
+            }),
+            bounds,
+          );
+          setGameLevels((currentLevels) => {
+            if (currentLevels[game] === recommended) return currentLevels;
+            const nextLevels = { ...currentLevels, [game]: recommended };
+            saveGameLevels(nextLevels);
+            return nextLevels;
+          });
+        }
+
         return next;
       });
     },
@@ -1086,14 +1290,14 @@ function App() {
   );
 
   const beginTrackedGame = useCallback((game: GameId) => {
-    trackedRoundAccuracy.current[game] = [];
+    trackedRounds.current[game] = [];
   }, []);
 
   const trackGameRound = useCallback(
     (game: GameId, round: PracticeChargeRoundInput) => {
-      trackedRoundAccuracy.current[game] = [
-        ...(trackedRoundAccuracy.current[game] ?? []),
-        round.accuracy,
+      trackedRounds.current[game] = [
+        ...(trackedRounds.current[game] ?? []),
+        round,
       ];
     },
     [],
@@ -1101,17 +1305,28 @@ function App() {
 
   const completeTrackedGame = useCallback(
     (game: GameId) => {
-      const accuracies = trackedRoundAccuracy.current[game] ?? [];
+      const rounds = trackedRounds.current[game] ?? [];
       const sessionAccuracy =
-        accuracies.length > 0
-          ? accuracies.reduce((sum, accuracy) => sum + accuracy, 0) /
-            accuracies.length
+        rounds.length > 0
+          ? rounds.reduce((sum, round) => sum + round.accuracy, 0) /
+            rounds.length
           : 0;
-      recordGamePerformance(game, sessionAccuracy);
+
+      // Pace is per expected item, so a longer round is not penalised.
+      const items = rounds.reduce((sum, round) => sum + round.itemCount, 0);
+      const responseMs = rounds.reduce((sum, round) => sum + round.responseMs, 0);
+
+      recordGameSession(game, {
+        accuracy: sessionAccuracy,
+        level: gameLevels[game] ?? GAME_LEVEL_BOUNDS[game]?.defaultLevel ?? null,
+        exactRounds: rounds.filter((round) => round.accuracy >= 1).length,
+        totalRounds: rounds.length || TOTAL_ROUNDS,
+        meanResponseMs: items > 0 ? responseMs / items : null,
+      });
       markGameCleared(game, sessionAccuracy);
-      delete trackedRoundAccuracy.current[game];
+      delete trackedRounds.current[game];
     },
-    [markGameCleared, recordGamePerformance],
+    [gameLevels, markGameCleared, recordGameSession],
   );
 
   const completeNumberMemory = useCallback(() => {
@@ -1173,7 +1388,9 @@ function App() {
     (game: GameId) => {
       unlockAudio();
       if (game === "pulse-path") {
-        startNewSession(DEFAULT_PATH_LENGTH);
+        startNewSession(
+          startingLevelFor("pulse-path", gameLevels) ?? DEFAULT_PATH_LENGTH,
+        );
         return;
       }
 
@@ -1181,7 +1398,7 @@ function App() {
       setPhase("home");
       setActiveGame(game);
     },
-    [beginTrackedGame, startNewSession, unlockAudio],
+    [beginTrackedGame, gameLevels, startNewSession, unlockAudio],
   );
 
   const initiateCircuit = useCallback(() => {
@@ -1325,7 +1542,14 @@ function App() {
 
       setSummary(nextSummary);
       markGameCleared("pulse-path", nextSummary.accuracy);
-      recordGamePerformance("pulse-path", nextSummary.accuracy);
+      recordGameSession("pulse-path", {
+        accuracy: nextSummary.accuracy,
+        level: completedSession.startingLevel,
+        exactRounds: nextSummary.perfectRounds,
+        totalRounds: TOTAL_ROUNDS,
+        // Pulse Path is deliberately untimed; speed must not enter its record.
+        meanResponseMs: null,
+      });
       setCompletedSummaries(nextCompletedSummaries);
       setHistory(nextHistory);
       setPhase("summary");
@@ -1347,7 +1571,7 @@ function App() {
       completedSummaries,
       history,
       markGameCleared,
-      recordGamePerformance,
+      recordGameSession,
       settings.reducedMotion,
     ],
   );
@@ -1666,13 +1890,16 @@ function App() {
           <Home
             circuitGames={circuitGames}
             gamePerformance={gamePerformance}
+            progressSummaries={progressSummaries}
             history={history}
             onInitiateCircuit={initiateCircuit}
             onCircuitGamesChange={setCircuitGames}
             playedGames={playedGames.games}
             practiceCharge={practiceCharge}
             onStart={() => {
-              setPathLength(DEFAULT_PATH_LENGTH);
+              setPathLength(
+                startingLevelFor("pulse-path", gameLevels) ?? DEFAULT_PATH_LENGTH,
+              );
               setActiveGame("pulse-path");
               setPhase("setup");
               setAnnouncement(
@@ -1941,6 +2168,7 @@ function App() {
         {activeGame === "number-memory" && (
           <NumberMemory
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("number-memory", gameLevels) ?? undefined}
             onComplete={completeNumberMemoryFlow}
             onFeedback={(round) => {
               playConfirmation(round.accuracy === 1);
@@ -1960,6 +2188,7 @@ function App() {
         {activeGame === "rule-shift" && (
           <RuleShift
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("rule-shift", gameLevels) ?? undefined}
             onComplete={completeRuleShiftFlow}
             onCue={playPulse}
             onFeedback={(round) => {
@@ -1979,6 +2208,7 @@ function App() {
         {activeGame === "signal-sweep" && (
           <SignalSweep
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("signal-sweep", gameLevels) ?? undefined}
             onComplete={completeSignalSweepFlow}
             onCue={playPulse}
             onFeedback={(round) => {
@@ -1998,6 +2228,7 @@ function App() {
         {activeGame === "vector-match" && (
           <VectorMatch
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("vector-match", gameLevels) ?? undefined}
             onComplete={completeVectorMatchFlow}
             onCue={playPulse}
             onFeedback={(round) => {
@@ -2017,6 +2248,7 @@ function App() {
         {activeGame === "trace-pair" && (
           <TracePair
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("trace-pair", gameLevels) ?? undefined}
             onComplete={completeTracePairFlow}
             onCue={playPulse}
             onFeedback={(round) => {
@@ -2036,6 +2268,7 @@ function App() {
         {activeGame === "name-recall" && (
           <NameRecall
             autoStart={circuitRun !== null}
+            startingLevel={startingLevelFor("name-recall", gameLevels) ?? undefined}
             onComplete={completeNameRecallFlow}
             onCue={playPulse}
             onFeedback={(round) => {
@@ -2070,6 +2303,7 @@ function App() {
 interface HomeProps {
   circuitGames: GameId[];
   gamePerformance: GamePerformanceMap;
+  progressSummaries: Partial<Record<GameId, ProgressSummary>>;
   history: HistoryEntry[];
   onInitiateCircuit: () => void;
   onCircuitGamesChange: (games: GameId[]) => void;
@@ -2670,12 +2904,14 @@ function OrbitGameNodeSurface({
   game,
   name,
   playStats,
+  progressSummary,
   variant,
 }: {
   category: string;
   game: GameId;
   name: string;
   playStats: GamePerformance;
+  progressSummary?: ProgressSummary;
   variant: number;
 }) {
   const geometry = ORBIT_NODE_GEOMETRY[variant] ?? ORBIT_NODE_GEOMETRY[0];
@@ -2687,6 +2923,14 @@ function OrbitGameNodeSurface({
     playStats.sessions === 0
       ? null
       : Math.round((playStats.accuracyTotal / playStats.sessions) * 100);
+  /*
+   * `summarizeProgress` withholds a direction until two full windows of real
+   * observations exist, so this mark cannot appear off the back of one good
+   * session. It describes this exercise only — never general ability.
+   */
+  const direction = progressSummary?.direction ?? "unknown";
+  const trendMark =
+    direction === "improving" ? "↑" : direction === "declining" ? "↓" : null;
 
   return (
     <span className="game-node-drift">
@@ -2737,6 +2981,14 @@ function OrbitGameNodeSurface({
           >
             <b>{successPercent === null ? "—%" : `${successPercent}%`}</b>
             <span>success</span>
+            {trendMark !== null && (
+              <i
+                className={`game-node-trend is-${direction}`}
+                aria-hidden="true"
+              >
+                {trendMark}
+              </i>
+            )}
           </span>
         </span>
       </span>
@@ -2753,6 +3005,7 @@ function OrbitGameNode({
   name,
   placement,
   playStats,
+  progressSummary,
   onPointerDragCancel,
   onPointerDragEnd,
   onPointerDragMove,
@@ -2769,6 +3022,7 @@ function OrbitGameNode({
   name: string;
   placement: GamePlacement;
   playStats: GamePerformance;
+  progressSummary?: ProgressSummary;
   onPointerDragCancel: () => void;
   onPointerDragEnd: (game: GameId, x: number, y: number) => void;
   onPointerDragMove: (x: number, y: number) => void;
@@ -2932,6 +3186,7 @@ function OrbitGameNode({
           game={game}
           name={name}
           playStats={playStats}
+          progressSummary={progressSummary}
           variant={variant}
         />
       </button>
@@ -2959,6 +3214,7 @@ function OrbitGameNode({
 function Home({
   circuitGames,
   gamePerformance,
+  progressSummaries,
   history,
   onInitiateCircuit,
   onCircuitGamesChange,
@@ -3366,6 +3622,7 @@ function Home({
         playStats={
           gamePerformance[definition.game] ?? EMPTY_GAME_PERFORMANCE
         }
+        progressSummary={progressSummaries[definition.game]}
         variant={definition.variant}
       />
     );

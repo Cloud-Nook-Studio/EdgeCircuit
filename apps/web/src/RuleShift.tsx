@@ -4,6 +4,9 @@ import {
   TOTAL_ROUNDS,
   evaluateRuleShiftChoice,
   generateRuleShiftTrial,
+  RULE_SHIFT_DEFAULT_LEVEL,
+  RULE_SHIFT_MAX_LEVEL,
+  RULE_SHIFT_MIN_LEVEL,
   type HorizontalChoice,
   type PracticeChargeRoundInput,
 } from "@brain-training/shared";
@@ -22,6 +25,8 @@ interface RuleShiftResult {
 
 interface RuleShiftProps {
   autoStart?: boolean;
+  /** Level the engine recommends from past sessions; falls back to the default. */
+  startingLevel?: number;
   onComplete: () => void;
   onCue: (target: number) => void;
   onExit: () => void;
@@ -39,8 +44,12 @@ export function RuleShift({
   onCue,
   onExit,
   onFeedback,
+  startingLevel,
 }: RuleShiftProps) {
   const [seed, setSeed] = useState(createSeed);
+  const [interferenceLevel, setInterferenceLevel] = useState<number>(
+    startingLevel ?? RULE_SHIFT_DEFAULT_LEVEL,
+  );
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<RuleShiftPhase>(
     autoStart ? "play" : "setup",
@@ -55,8 +64,8 @@ export function RuleShift({
   const completionReported = useRef(false);
 
   const trial = useMemo(
-    () => generateRuleShiftTrial(seed, roundIndex),
-    [roundIndex, seed],
+    () => generateRuleShiftTrial(seed, roundIndex, interferenceLevel),
+    [interferenceLevel, roundIndex, seed],
   );
 
   useEffect(() => {
@@ -148,6 +157,40 @@ export function RuleShift({
             <span>Position</span>
             <i>or</i>
             <span>Direction</span>
+          </div>
+          <div
+            className="exercise-level-control"
+            role="group"
+            aria-label="Interference"
+          >
+            <span className="exercise-level-label">Interference</span>
+            <div className="digit-span-stepper">
+              <button
+                type="button"
+                aria-label="Reduce interference"
+                disabled={interferenceLevel === RULE_SHIFT_MIN_LEVEL}
+                onClick={() =>
+                  setInterferenceLevel((current) => Math.max(RULE_SHIFT_MIN_LEVEL, current - 1))
+                }
+              >
+                <span aria-hidden="true">−</span>
+              </button>
+              <output aria-live="polite">
+                <strong>{interferenceLevel}</strong>
+                <span>{interferenceLevel === 1 ? "level" : "levels"}</span>
+              </output>
+              <button
+                type="button"
+                aria-label="Increase interference"
+                disabled={interferenceLevel === RULE_SHIFT_MAX_LEVEL}
+                onClick={() =>
+                  setInterferenceLevel((current) => Math.min(RULE_SHIFT_MAX_LEVEL, current + 1))
+                }
+              >
+                <span aria-hidden="true">+</span>
+              </button>
+            </div>
+            <p className="exercise-level-hint">Higher levels make the ignored attribute disagree more often.</p>
           </div>
           <button
             className="primary-button rule-shift-start"

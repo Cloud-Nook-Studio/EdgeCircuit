@@ -94,7 +94,16 @@ explicitly named `npm run test:e2e:phone`, `npm run typecheck:all`, and
 
 - Unfinished sessions are disposable: **Exit to home** discards the run, and
   the app does not offer save or resume controls.
-- Only completed sessions influence the next starting difficulty.
+- Only completed sessions influence the next starting difficulty. Difficulty is
+  fixed within a session and adapts between sessions toward a 70–85% success
+  band on that exercise; it eases immediately after a session that was clear
+  overload. All seven exercises now scale: path length, digit span, candidate
+  signals, assemblies per round, rotation difficulty, interference, and people
+  per round. Each setup screen exposes its own demand directly.
+- Each completed session is kept as one timestamped per-game observation, so
+  accuracy can be read as a trend rather than only as a running mean. A game
+  shows a trend mark only once there are enough observations to support a
+  direction.
 - Response speed does not affect task score or adaptation. A broad,
   accuracy-gated pace band contributes at most four points per round to the
   separate daily Practice Charge.
