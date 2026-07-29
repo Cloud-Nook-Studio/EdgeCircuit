@@ -188,6 +188,7 @@ export function TracePair({
   }, [onComplete, phase, roundIndex]);
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     setSeed(createSeed());
     setRoundIndex(0);
     setSelectedIndices([]);
@@ -237,16 +238,24 @@ export function TracePair({
         className="trace-pair trace-pair-setup"
         aria-labelledby="trace-pair-setup-title"
       >
-        <div className="trace-pair-topbar">
-          <button className="trace-pair-exit" type="button" onClick={onExit}>
+        <div className="session-topbar trace-pair-topbar">
+          <button
+            className="quiet-button trace-pair-exit"
+            type="button"
+            onClick={onExit}
+          >
             <span aria-hidden="true">←</span> Exit to home
           </button>
-          <span className="trace-pair-setup-label">Session setup</span>
-          <span className="trace-pair-round-badge">{TOTAL_ROUNDS} rounds</span>
+          <span className="setup-label trace-pair-setup-label">
+            Session setup
+          </span>
+          <span className="no-timer-badge trace-pair-round-badge">
+            {TOTAL_ROUNDS} rounds
+          </span>
         </div>
 
         <div className="trace-pair-setup-card">
-          <div className="trace-pair-phase-badge">
+          <div className="phase-badge trace-pair-phase-badge">
             <span aria-hidden="true" />
             Relational match
           </div>
@@ -292,13 +301,10 @@ export function TracePair({
                 <span aria-hidden="true">+</span>
               </button>
             </div>
-          <p className="trace-pair-task-note">
-            Results describe performance on this matching task.
-          </p>
             <p className="exercise-level-hint">More assemblies means more pairs to compare before answering.</p>
           </div>
           <button
-            className="trace-pair-start"
+            className="primary-button trace-pair-start"
             type="button"
             onClick={startSession}
           >
@@ -345,7 +351,7 @@ export function TracePair({
         </div>
         <div className="trace-pair-summary-actions">
           <button
-            className="trace-pair-train-again"
+            className="primary-button trace-pair-train-again"
             type="button"
             onClick={startSession}
           >
@@ -368,8 +374,12 @@ export function TracePair({
       className={`trace-pair trace-pair-${phase}`}
       aria-labelledby="trace-pair-title"
     >
-      <div className="trace-pair-topbar">
-        <button className="trace-pair-exit" type="button" onClick={onExit}>
+      <div className="session-topbar trace-pair-topbar">
+        <button
+          className="quiet-button trace-pair-exit"
+          type="button"
+          onClick={onExit}
+        >
           <span aria-hidden="true">←</span> Exit to home
         </button>
         <div className="trace-pair-progress">
@@ -407,7 +417,7 @@ export function TracePair({
       </div>
 
       <div className="trace-pair-card">
-        <div className="trace-pair-phase-badge">
+        <div className="phase-badge trace-pair-phase-badge">
           <span aria-hidden="true" />
           Structural match
         </div>

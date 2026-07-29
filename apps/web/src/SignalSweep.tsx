@@ -176,6 +176,7 @@ export function SignalSweep({
   }, [onComplete, phase, roundIndex]);
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     setSeed(createSeed());
     setRoundIndex(0);
     setSelectedIndex(null);
@@ -217,22 +218,24 @@ export function SignalSweep({
         className="signal-sweep signal-sweep-setup"
         aria-labelledby="signal-sweep-setup-title"
       >
-        <div className="signal-sweep-topbar">
+        <div className="session-topbar signal-sweep-topbar">
           <button
-            className="signal-sweep-exit"
+            className="quiet-button signal-sweep-exit"
             type="button"
             onClick={onExit}
           >
             <span aria-hidden="true">←</span> Exit to home
           </button>
-          <span className="signal-sweep-setup-label">Session setup</span>
-          <span className="signal-sweep-round-badge">
+          <span className="setup-label signal-sweep-setup-label">
+            Session setup
+          </span>
+          <span className="no-timer-badge signal-sweep-round-badge">
             {TOTAL_ROUNDS} rounds
           </span>
         </div>
 
         <div className="signal-sweep-setup-card">
-          <div className="signal-sweep-phase-badge">
+          <div className="phase-badge signal-sweep-phase-badge">
             <span aria-hidden="true" />
             Visual search
           </div>
@@ -252,7 +255,7 @@ export function SignalSweep({
             aria-label="Signals per round"
           >
             <span>Signals per round</span>
-            <div className="signal-sweep-count-stepper">
+            <div className="digit-span-stepper signal-sweep-count-stepper">
               <button
                 type="button"
                 aria-label="Decrease signals"
@@ -289,11 +292,8 @@ export function SignalSweep({
               </button>
             </div>
           </div>
-          <p className="signal-sweep-task-note">
-            Results describe performance on this search task.
-          </p>
           <button
-            className="signal-sweep-start"
+            className="primary-button signal-sweep-start"
             type="button"
             onClick={startSession}
           >
@@ -340,7 +340,7 @@ export function SignalSweep({
         </div>
         <div className="signal-sweep-summary-actions">
           <button
-            className="signal-sweep-train-again"
+            className="primary-button signal-sweep-train-again"
             type="button"
             onClick={startSession}
           >
@@ -363,8 +363,12 @@ export function SignalSweep({
       className={`signal-sweep signal-sweep-${phase}`}
       aria-labelledby="signal-sweep-title"
     >
-      <div className="signal-sweep-topbar">
-        <button className="signal-sweep-exit" type="button" onClick={onExit}>
+      <div className="session-topbar signal-sweep-topbar">
+        <button
+          className="quiet-button signal-sweep-exit"
+          type="button"
+          onClick={onExit}
+        >
           <span aria-hidden="true">←</span> Exit to home
         </button>
         <div className="signal-sweep-progress">
@@ -402,7 +406,7 @@ export function SignalSweep({
       </div>
 
       <div className="signal-sweep-card">
-        <div className="signal-sweep-phase-badge">
+        <div className="phase-badge signal-sweep-phase-badge">
           <span aria-hidden="true" />
           Exact-match sweep
         </div>
@@ -428,6 +432,39 @@ export function SignalSweep({
           role="group"
           aria-label="Signal options"
         >
+          {optionCount === 6 && (
+            <svg
+              className="signal-sweep-radials"
+              aria-hidden="true"
+              preserveAspectRatio="none"
+              viewBox="0 0 680 320"
+            >
+              {[
+                [340, 56],
+                [548, 106],
+                [548, 214],
+                [340, 264],
+                [132, 214],
+                [132, 106],
+              ].map(([x, y], index) => (
+                <line
+                  className={
+                    phase === "feedback" &&
+                    currentCorrect &&
+                    selectedIndex === index
+                      ? "is-correct"
+                      : undefined
+                  }
+                  key={`${x}-${y}`}
+                  x1="340"
+                  x2={x}
+                  y1="160"
+                  y2={y}
+                />
+              ))}
+              <circle cx="340" cy="160" r="3" />
+            </svg>
+          )}
           {trial.options.map((option, optionIndex) => {
             const isSelected = selectedIndex === optionIndex;
             const optionState =

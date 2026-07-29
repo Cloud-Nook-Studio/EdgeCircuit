@@ -238,7 +238,7 @@ test("home screen fits its viewport and exposes theme and sound preferences", as
   await expect(page.locator(".home-orbit-scan")).toHaveCount(0);
   await expect(page.locator(".home-orbit-ring")).toHaveCount(0);
   await expect(page.locator(".home-pulse-fragment")).toHaveCount(0);
-  await expect(page.locator(".home-signal-dot")).toHaveCount(12);
+  await expect(page.locator(".home-signal-dot")).toHaveCount(4);
   await expect(page.locator(".home-micro-object")).toHaveCount(0);
   await expect(page.locator(".home-circuit-background")).toBeVisible();
   await expect(
@@ -338,24 +338,20 @@ test("home screen fits its viewport and exposes theme and sound preferences", as
     "reverse",
   );
   await expect(page.locator(".daily-core-orbits")).toBeVisible();
-  await expect(page.locator(".core-orbit-plane")).toHaveCount(3);
-  await expect(page.locator(".core-atom-plane")).toHaveCount(3);
+  await expect(page.locator(".core-orbit-plane")).toHaveCount(2);
+  await expect(page.locator(".core-atom-plane")).toHaveCount(2);
   await expect(page.locator(".core-atom-plane animateMotion")).toHaveCount(0);
   await expect(page.locator(".core-atom-plane-gold")).toHaveCSS(
     "animation-duration",
-    "14s",
-  );
-  await expect(page.locator(".core-atom-plane-white")).toHaveCSS(
-    "animation-duration",
-    "18s",
-  );
-  await expect(page.locator(".core-atom-plane-white")).toHaveCSS(
-    "animation-name",
-    "core-halo-sketch-turn-reverse",
+    "38s",
   );
   await expect(page.locator(".core-atom-plane-blue")).toHaveCSS(
     "animation-duration",
-    "23s",
+    "52s",
+  );
+  await expect(page.locator(".core-atom-plane-blue")).toHaveCSS(
+    "animation-name",
+    "core-halo-sketch-turn-reverse",
   );
   await expect(page.locator(".daily-core-circuitry")).toHaveCSS(
     "display",
@@ -409,7 +405,7 @@ test("home screen fits its viewport and exposes theme and sound preferences", as
   );
   await expect(page.locator(".game-node-success b").first()).toHaveCSS(
     "font-size",
-    "13.5px",
+    "14.5px",
   );
   await expect(page.locator(".orbit-game-icon i")).toHaveCount(0);
   await expect(page.locator(".orbit-game-icon").first()).toHaveCSS(
@@ -2593,7 +2589,9 @@ test("a completed fixed-length session is durable and setup eases after overload
     summaries: 1,
   });
 
-  await expect(page.getByRole("heading", { name: "Nice focus." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Path resolved." }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Return home" }).click();
   await page.reload();
   await expect(page.getByText("Last Pulse Path session")).toBeVisible();
@@ -2659,7 +2657,9 @@ test("the constellation stays stable within a round and fully remaps between rou
     }
   }
 
-  await expect(page.getByRole("heading", { name: "Nice focus." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Path resolved." }),
+  ).toBeVisible();
   await page.getByRole("button", { name: /Train again/i }).click();
   expect(await constellationSignature(page)).not.toEqual(roundSignatures[0]);
 });

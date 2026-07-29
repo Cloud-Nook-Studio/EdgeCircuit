@@ -191,6 +191,7 @@ export function VectorMatch({
   }, [onComplete, phase, roundIndex]);
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     setSeed(createSeed());
     setRoundIndex(0);
     setResults([]);
@@ -229,20 +230,24 @@ export function VectorMatch({
         className="vector-match vector-match-setup-screen"
         aria-labelledby="vector-match-setup-title"
       >
-        <div className="vector-match-topbar">
+        <div className="session-topbar vector-match-topbar">
           <button
-            className="vector-match-exit"
+            className="quiet-button vector-match-exit"
             type="button"
             onClick={onExit}
           >
             <span aria-hidden="true">←</span> Exit to home
           </button>
-          <span className="vector-match-setup-label">Session setup</span>
-          <span className="vector-match-round-badge">{TOTAL_ROUNDS} rounds</span>
+          <span className="setup-label vector-match-setup-label">
+            Session setup
+          </span>
+          <span className="no-timer-badge vector-match-round-badge">
+            {TOTAL_ROUNDS} rounds
+          </span>
         </div>
 
         <div className="vector-match-card vector-match-setup-card">
-          <div className="vector-match-phase-badge">
+          <div className="phase-badge vector-match-phase-badge">
             <span aria-hidden="true" />
             Spatial comparison
           </div>
@@ -301,7 +306,7 @@ export function VectorMatch({
             <p className="exercise-level-hint">A wider angle between the figures is harder to resolve.</p>
           </div>
           <button
-            className="vector-match-start"
+            className="primary-button vector-match-start"
             type="button"
             onClick={startSession}
           >
@@ -348,7 +353,7 @@ export function VectorMatch({
         </div>
         <div className="vector-match-summary-actions">
           <button
-            className="vector-match-train-again"
+            className="primary-button vector-match-train-again"
             type="button"
             onClick={startSession}
           >
@@ -373,8 +378,12 @@ export function VectorMatch({
       className="vector-match vector-match-session"
       aria-labelledby="vector-match-title"
     >
-      <div className="vector-match-topbar">
-        <button className="vector-match-exit" type="button" onClick={onExit}>
+      <div className="session-topbar vector-match-topbar">
+        <button
+          className="quiet-button vector-match-exit"
+          type="button"
+          onClick={onExit}
+        >
           <span aria-hidden="true">←</span> Exit to home
         </button>
         <div className="vector-match-progress">
@@ -412,7 +421,7 @@ export function VectorMatch({
       </div>
 
       <div className="vector-match-card vector-match-play-card">
-        <div className="vector-match-phase-badge">
+        <div className="phase-badge vector-match-phase-badge">
           <span aria-hidden="true" />
           Compare the frame
         </div>

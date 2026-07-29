@@ -3341,6 +3341,8 @@ function Home({
       description:
         "Mean task accuracy across completed rounds today",
       id: "accuracy",
+      isStrong:
+        dailyAccuracyPercent !== null && dailyAccuracyPercent >= 85,
       label: "Accuracy",
       unit: dailyAccuracyPercent === null ? "" : "%",
       value:
@@ -3352,6 +3354,7 @@ function Home({
       description:
         "Mean response time per expected item across completed rounds today",
       id: "pace",
+      isStrong: false,
       label: "Pace",
       unit: paceUnit,
       value: paceValue,
@@ -3360,6 +3363,8 @@ function Home({
       description:
         "Mean task accuracy in Pulse Path and Digit Hold rounds today",
       id: "recall",
+      isStrong:
+        recallAccuracyPercent !== null && recallAccuracyPercent >= 85,
       label: "Recall",
       unit: recallAccuracyPercent === null ? "" : "%",
       value:
@@ -3370,6 +3375,7 @@ function Home({
     {
       description: "Completed rounds today",
       id: "rounds",
+      isStrong: false,
       label: "Rounds",
       unit: "",
       value: String(practiceCharge.reps),
@@ -3639,7 +3645,7 @@ function Home({
       </h1>
       <p className="circuit-edit-hint" aria-hidden="true">
         <span />
-        Drag off loop to float
+        Arrange circuit
       </p>
       <p className="sr-only" id="circuit-edit-instructions">
         Drag a game into the surrounding space to remove it from the Daily
@@ -3695,7 +3701,7 @@ function Home({
             <path d="M672 46 684 73 712 82 723 109" />
           </g>
         </svg>
-        {Array.from({ length: 12 }, (_, index) => (
+        {Array.from({ length: 4 }, (_, index) => (
           <i className="home-signal-dot" key={`home-signal-${index}`} />
         ))}
       </div>
@@ -3812,12 +3818,6 @@ function Home({
               d="M8 79C14 38 43 17 82 20C122 18 149 43 152 80C146 119 116 143 78 140C39 143 12 117 8 79Z"
             />
           </g>
-          <g className="core-orbit-plane core-atom-plane core-atom-plane-white">
-            <path
-              className="core-halo-sketch core-halo-sketch-b"
-              d="M15 83C20 48 47 25 84 27C121 24 143 48 146 82C140 114 111 135 77 132C42 136 20 113 15 83Z"
-            />
-          </g>
           <g className="core-orbit-plane core-orbit-plane-inner core-atom-plane core-atom-plane-blue">
             <path
               className="core-halo-sketch core-halo-sketch-c"
@@ -3856,7 +3856,9 @@ function Home({
           {diagnostics.map((diagnostic, index) => {
             return (
               <span
-                className={`daily-diagnostic daily-diagnostic-${index + 1} daily-diagnostic-${diagnostic.id}`}
+                className={`daily-diagnostic daily-diagnostic-${index + 1} daily-diagnostic-${diagnostic.id}${
+                  diagnostic.isStrong ? " is-strong" : ""
+                }`}
                 data-diagnostic-id={diagnostic.id}
                 key={diagnostic.id}
                 role="listitem"
@@ -4122,7 +4124,7 @@ function Summary({
           ✓
         </span>
         <span className="eyebrow">Session complete</span>
-        <h1 id="summary-title">Nice focus.</h1>
+        <h1 id="summary-title">Path resolved.</h1>
         <p>
           You finished all {TOTAL_ROUNDS} rounds. Here is what happened on this
           exercise today.

@@ -9248,10 +9248,10 @@ html[data-contrast="high"] .blueprint-node {
 }
 
 .game-chip-body {
-  fill: rgba(23, 46, 64, 0.96);
-  stroke: #7898ac;
+  fill: rgba(16, 34, 49, 0.96);
+  stroke: #87a5b7;
   stroke-linejoin: bevel;
-  stroke-width: 1.2;
+  stroke-width: 1.35;
   transition:
     fill 220ms ease,
     stroke 220ms ease;
@@ -9259,7 +9259,7 @@ html[data-contrast="high"] .blueprint-node {
 
 .game-chip-offset {
   fill: none;
-  stroke: rgba(124, 161, 183, 0.66);
+  stroke: rgba(124, 161, 183, 0.43);
   stroke-dasharray: 5 4;
   stroke-linejoin: bevel;
   stroke-width: 0.72;
@@ -9267,13 +9267,13 @@ html[data-contrast="high"] .blueprint-node {
 
 .game-chip-brace {
   fill: none;
-  stroke: rgba(156, 181, 196, 0.32);
+  stroke: rgba(156, 181, 196, 0.2);
   stroke-width: 0.78;
 }
 
 .game-chip-guide {
   fill: none;
-  stroke: rgba(99, 135, 158, 0.42);
+  stroke: rgba(99, 135, 158, 0.24);
   stroke-dasharray: 1 4;
   stroke-linecap: round;
   stroke-width: 0.68;
@@ -13121,15 +13121,19 @@ html[data-contrast="high"] .circuit-reserve {
   stroke-width: 0.6px;
 }
 
+.signal-sweep-radials {
+  display: none;
+}
+
 @media (min-width: 721px) {
   .game-library .orbit-game-selector {
-    width: min(790px, 100%);
-    min-height: 560px;
+    width: min(900px, 100%);
+    min-height: 630px;
   }
 
   .game-library > .circuit-reserve.circuit-reserve {
-    width: min(1000px, calc(100% + 12px));
-    height: 580px;
+    width: min(1080px, calc(100% + 12px));
+    height: 650px;
   }
 }
 
@@ -15955,18 +15959,15 @@ html[data-theme="light"] .game-library .game-choice.is-complete .game-node-drift
     background:
       radial-gradient(
         circle at 50% 49%,
-        #000 0 43%,
-        #02050a 44% 52%,
-        rgba(194, 151, 67, 0.94) 53%,
-        rgba(102, 78, 34, 0.76) 54%,
-        #071321 55% 68%,
-        #02060c 70%,
-        #071423 100%
+        #000 0 52%,
+        #03080e 53% 66%,
+        #091724 67% 78%,
+        #02060b 79% 100%
       );
     box-shadow:
-      0 0 0 1px rgba(209, 170, 85, 0.28),
-      0 0 20px rgba(0, 0, 0, 0.9),
-      0 0 30px rgba(214, 226, 232, 0.06);
+      0 0 0 1px rgba(209, 170, 85, 0.22),
+      0 0 16px rgba(0, 0, 0, 0.76),
+      0 0 26px rgba(89, 133, 159, 0.05);
   }
 
   .daily-circuit-core::after,
@@ -16136,36 +16137,25 @@ html[data-theme="light"] .game-library .game-choice.is-complete .game-node-drift
  */
 @media (min-width: 721px) {
   .daily-core-orbits {
-    width: 186px;
-    height: 186px;
-    opacity: 0.76;
+    width: 194px;
+    height: 194px;
+    opacity: 0.56;
   }
 
   .core-orbit-plane.core-atom-plane-gold {
-    animation: core-halo-sketch-turn 14s linear infinite;
-  }
-
-  .core-orbit-plane.core-atom-plane-white {
-    animation: core-halo-sketch-turn-reverse 18s linear infinite;
-    transform: rotate(-49deg);
-    transform-box: view-box;
-    transform-origin: 80px 80px;
+    animation: core-halo-sketch-turn 38s linear infinite;
   }
 
   .core-orbit-plane.core-atom-plane-blue {
-    animation: core-halo-sketch-turn 23s linear infinite;
+    animation: core-halo-sketch-turn-reverse 52s linear infinite;
   }
 
   .core-halo-sketch-a {
-    stroke: rgba(250, 252, 252, 0.82);
-  }
-
-  .core-halo-sketch-b {
-    stroke: rgba(207, 221, 228, 0.62);
+    stroke: rgba(222, 232, 237, 0.66);
   }
 
   .core-halo-sketch-c {
-    stroke: rgba(150, 180, 197, 0.54);
+    stroke: rgba(124, 166, 190, 0.5);
   }
 
   .daily-circuit-core,
@@ -17666,4 +17656,651 @@ html:not([data-contrast="high"]) .signal-sweep-setup-card h1 {
   font-weight: 500;
   font-optical-sizing: auto;
   letter-spacing: -0.018em;
+}
+
+/* --------------------------------------------------------------------------
+ * 15. Executive instrument calibration.
+ *
+ * The home route and exercise shells now share one readable hierarchy:
+ * authoritative perimeter, quiet construction lines, useful annotations, and
+ * motion that explains the circuit instead of decorating it. This section is
+ * desktop-scoped while the native/mobile prototype remains parked.
+ * ------------------------------------------------------------------------ */
+
+@media (min-width: 721px) {
+  html:not([data-contrast="high"]) .orbital-library {
+    width: min(1180px, calc(100% - 48px));
+    margin-inline: auto;
+  }
+
+  html:not([data-contrast="high"]) .home-circuit-background {
+    opacity: 0.5;
+  }
+
+  html:not([data-contrast="high"]) .background-circuit-scaffold path,
+  html:not([data-contrast="high"]) .background-circuit-loops path {
+    stroke-width: 0.68px;
+  }
+
+  html:not([data-contrast="high"]) .dyson-orbit {
+    opacity: 0.48;
+  }
+
+  html:not([data-contrast="high"]) .dyson-orbit-wide {
+    animation-duration: 74s;
+  }
+
+  html:not([data-contrast="high"]) .dyson-orbit-tall {
+    animation-duration: 92s;
+    opacity: 0.54;
+  }
+
+  html:not([data-contrast="high"]) .dyson-orbit-inner {
+    animation-duration: 61s;
+  }
+
+  html:not([data-contrast="high"]) .dyson-orbit-angular {
+    animation-duration: 86s;
+    opacity: 0.62;
+  }
+
+  html:not([data-contrast="high"]) .circuit-edit-hint {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    margin: 0;
+    opacity: 0;
+    translate: -50% 0;
+    transition: opacity 180ms ease;
+    pointer-events: none;
+  }
+
+  html:not([data-contrast="high"])
+    .orbital-library:has(
+      .game-node-placement:focus-visible,
+      .game-node-placement:hover,
+      .game-choice.is-dragging
+    )
+    .circuit-edit-hint {
+    opacity: 1;
+  }
+
+  html:not([data-contrast="high"]) .game-node-blueprint {
+    filter:
+      drop-shadow(0 1px 0 rgba(189, 208, 218, 0.08))
+      drop-shadow(0 8px 14px rgba(1, 8, 13, 0.22));
+  }
+
+  html:not([data-contrast="high"]) .game-chip-offset {
+    opacity: 0.72;
+  }
+
+  html:not([data-contrast="high"]) .game-chip-brace,
+  html:not([data-contrast="high"]) .game-chip-guide {
+    opacity: 0.68;
+  }
+
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    > .game-choice
+    .orbit-game-copy
+    small,
+  html:not([data-contrast="high"])
+    .game-library
+    .circuit-drag-ghost.is-from-circuit
+    .orbit-game-copy
+    small {
+    color: #94a9b7;
+    font-size: 8px;
+    font-weight: 720;
+    letter-spacing: 0.045em;
+  }
+
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    > .game-choice
+    .orbit-game-copy
+    strong,
+  html:not([data-contrast="high"])
+    .game-library
+    .circuit-drag-ghost.is-from-circuit
+    .orbit-game-copy
+    strong {
+    font-size: 17.5px;
+    letter-spacing: -0.018em;
+  }
+
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    .game-node-success
+    b {
+    font-size: 14.5px;
+  }
+
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    .game-node-session-label,
+  html:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    .game-node-success
+    span {
+    font-size: 8px;
+    letter-spacing: 0.065em;
+  }
+
+  html:not([data-contrast="high"]) .game-node-drag-handle {
+    opacity: 0.22;
+  }
+
+  html:not([data-contrast="high"]) .game-node-placement {
+    opacity: 0.46;
+  }
+
+  html:not([data-contrast="high"]) .daily-diagnostic {
+    min-height: 34px;
+    background:
+      linear-gradient(90deg, rgba(9, 22, 32, 0.94), rgba(9, 22, 32, 0.3));
+    box-shadow: none;
+  }
+
+  html:not([data-contrast="high"]) .daily-diagnostic > small {
+    color: #91a8b7;
+    font-size: 7.25px;
+    letter-spacing: 0.075em;
+  }
+
+  html:not([data-contrast="high"]) .daily-diagnostic > strong,
+  html:not([data-contrast="high"]) .daily-diagnostic-accuracy > strong,
+  html:not([data-contrast="high"]) .daily-diagnostic-recall > strong {
+    color: #dfe8ec;
+    font-size: 14px;
+  }
+
+  html:not([data-contrast="high"]) .daily-diagnostic > strong i {
+    font-size: 6.5px;
+  }
+
+  html:not([data-contrast="high"]) .daily-diagnostic.is-strong > strong {
+    color: #9fc5b2;
+  }
+
+  html:not([data-contrast="high"])
+    .daily-circuit-core
+    > .daily-circuit-initiate {
+    font-size: 19px;
+    letter-spacing: -0.012em;
+    white-space: nowrap;
+  }
+
+  html:not([data-contrast="high"])
+    .daily-circuit-core
+    > .daily-circuit-initiate-label {
+    font-size: 7.5px;
+    letter-spacing: 0.15em;
+  }
+
+  html:not([data-contrast="high"]) .brand small {
+    font-size: 8.5px;
+    letter-spacing: 0.11em;
+  }
+
+  html:not([data-contrast="high"]) .utility-title,
+  html:not([data-contrast="high"]) .practice-charge-copy small {
+    font-size: 8px;
+  }
+
+  html:not([data-contrast="high"]) .session-topbar.signal-sweep-topbar,
+  html:not([data-contrast="high"]) .session-topbar.vector-match-topbar,
+  html:not([data-contrast="high"]) .session-topbar.trace-pair-topbar {
+    display: grid;
+    width: min(900px, 100%);
+    min-height: 44px;
+    grid-template-columns: 1fr minmax(220px, 300px) 1fr;
+    align-items: center;
+    gap: 22px;
+    margin-inline: auto;
+  }
+
+  html:not([data-contrast="high"])
+    :is(
+      .signal-sweep-topbar,
+      .vector-match-topbar,
+      .trace-pair-topbar
+    )
+    > :first-child {
+    justify-self: start;
+  }
+
+  html:not([data-contrast="high"])
+    :is(
+      .signal-sweep-topbar,
+      .vector-match-topbar,
+      .trace-pair-topbar
+    )
+    > :last-child {
+    justify-self: end;
+  }
+
+  html:not([data-contrast="high"])
+    :is(
+      .signal-sweep-setup-card,
+      .vector-match-setup-card,
+      .trace-pair-setup-card
+    )
+    > p {
+    max-width: 610px;
+    margin: 10px auto 0;
+    color: #91a8b8;
+    font-size: 15.5px;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  html:not([data-contrast="high"]) .trace-pair-setup-graphic {
+    width: 238px;
+    height: 106px;
+    margin-block: 30px 12px;
+    grid-template-columns: 1fr 38px 1fr;
+  }
+
+  html:not([data-contrast="high"]) .trace-pair-setup-graphic span {
+    height: 72px;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-phase-badge,
+  html:not([data-contrast="high"]) .vector-match-phase-badge,
+  html:not([data-contrast="high"]) .trace-pair-phase-badge {
+    display: inline-flex;
+    width: max-content;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 721px) {
+  html[data-theme="light"]:not([data-contrast="high"]) body {
+    background:
+      linear-gradient(rgba(58, 88, 112, 0.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(58, 88, 112, 0.075) 1px, transparent 1px),
+      radial-gradient(
+        ellipse 86% 62% at 50% 38%,
+        rgba(255, 255, 255, 0.48),
+        transparent 70%
+      ),
+      linear-gradient(145deg, #f2f0ea 0%, #ecebe5 55%, #e4e5e2 100%);
+    background-size: 48px 48px, 48px 48px, auto, auto;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .game-chip-body {
+    fill: rgba(220, 231, 236, 0.72);
+    stroke: #58798d;
+    stroke-width: 1.4px;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .game-chip-offset {
+    stroke: rgba(68, 105, 129, 0.56);
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .game-chip-brace,
+  html[data-theme="light"]:not([data-contrast="high"]) .game-chip-guide {
+    stroke: rgba(67, 102, 123, 0.32);
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .game-node-blueprint,
+  html[data-theme="light"]:not([data-contrast="high"])
+    .game-library
+    .game-node-blueprint,
+  html[data-theme="light"]:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    .game-node-blueprint {
+    filter: drop-shadow(0 3px 6px rgba(37, 61, 82, 0.1));
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .game-library
+    .orbit-game-selector
+    > .game-choice
+    .orbit-game-copy
+    small {
+    color: #536b7d;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .daily-diagnostic {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(237, 242, 244, 0.98),
+        rgba(237, 242, 244, 0.48)
+      );
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .daily-diagnostic
+    > small {
+    color: #50687a;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .daily-diagnostic
+    > strong,
+  html[data-theme="light"]:not([data-contrast="high"])
+    .daily-diagnostic-accuracy
+    > strong,
+  html[data-theme="light"]:not([data-contrast="high"])
+    .daily-diagnostic-recall
+    > strong {
+    color: #213d4f;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .daily-diagnostic.is-strong
+    > strong {
+    color: #3f755d;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    :is(
+      .signal-sweep-setup-card,
+      .vector-match-setup-card,
+      .trace-pair-setup-card
+    )
+    > p {
+    color: #3f5568;
+  }
+}
+
+@media (min-width: 721px) {
+  html:not([data-contrast="high"]) .pace-bonus-spacer {
+    display: block;
+    width: 112px;
+    height: 58px;
+    justify-self: end;
+  }
+
+  html:not([data-contrast="high"])
+    :is(
+      .signal-sweep-start,
+      .signal-sweep-train-again,
+      .vector-match-start,
+      .vector-match-train-again,
+      .trace-pair-start,
+      .trace-pair-train-again
+    ) {
+    min-width: 280px;
+    min-height: 54px;
+    text-transform: none;
+    letter-spacing: 0.005em;
+  }
+
+  /*
+   * Signal Sweep is a search field, not a keypad. Six default candidates sit
+   * on a loose radial instrument; their large hit areas remain transparent.
+   */
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"] {
+    position: relative;
+    display: block;
+    width: min(680px, 100%);
+    height: 320px;
+    margin-top: 4px;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-radials {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-radials line {
+    stroke: rgba(91, 132, 158, 0.3);
+    stroke-dasharray: 2 7;
+    stroke-width: 0.72px;
+    vector-effect: non-scaling-stroke;
+    transition:
+      filter 180ms ease,
+      stroke 180ms ease,
+      stroke-width 180ms ease;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-radials line.is-correct {
+    stroke: #88b29e;
+    stroke-dasharray: 8 5 2 5;
+    stroke-width: 1.25px;
+    filter: drop-shadow(0 0 3px rgba(117, 174, 145, 0.62));
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-radials circle {
+    fill: #bd9850;
+    stroke: rgba(221, 198, 143, 0.5);
+    stroke-width: 0.8px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option {
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+    min-height: 112px;
+    border-color: rgba(92, 131, 156, 0.22);
+    background: transparent;
+    transform: none;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option::after {
+    inset: 14px;
+    border-color: rgba(102, 139, 162, 0.15);
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(1) {
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(2) {
+    top: 50px;
+    right: 57px;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(3) {
+    right: 57px;
+    bottom: 50px;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(4) {
+    bottom: 0;
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(5) {
+    bottom: 50px;
+    left: 57px;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:nth-of-type(6) {
+    top: 50px;
+    left: 57px;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:not(:disabled):hover,
+  html:not([data-contrast="high"])
+    .signal-sweep-options[data-option-count="6"]
+    .signal-sweep-option:focus-visible {
+    border-color: rgba(195, 159, 80, 0.74);
+    background: rgba(63, 91, 108, 0.11);
+    transform: none;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-option
+    .signal-sweep-glyph {
+    width: 88px;
+    height: 88px;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-count-stepper {
+    width: auto;
+    min-height: 0;
+    grid-template-columns: 64px minmax(150px, 200px) 64px;
+    gap: 18px;
+    margin-top: 18px;
+    border: 0;
+    background: transparent;
+    clip-path: none;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-count-stepper > button {
+    width: 64px;
+    height: 64px;
+    background: rgba(24, 40, 57, 0.92);
+    clip-path: var(--cut-small);
+    font-size: 30px;
+  }
+
+  html:not([data-contrast="high"]) .signal-sweep-count-stepper output {
+    display: grid;
+    justify-items: center;
+    gap: 5px;
+    border: 0;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-sweep-count-stepper
+    output
+    strong {
+    color: #d7bb7f;
+    font-family: var(--font-mono);
+    font-size: 64px;
+    font-weight: 550;
+    line-height: 0.9;
+  }
+
+  /* Vector Match compares exposed drawings rather than two opaque cards. */
+  html:not([data-contrast="high"]) .vector-match-comparison {
+    width: min(720px, 100%);
+    grid-template-columns: minmax(240px, 1fr) 66px minmax(240px, 1fr);
+  }
+
+  html:not([data-contrast="high"]) .vector-match-panel {
+    min-height: 272px;
+    border: 0;
+    background: transparent;
+    clip-path: none;
+  }
+
+  html:not([data-contrast="high"]) .vector-match-panel::before {
+    inset: 18px 8px;
+    border: 0;
+    border-top: 1px solid rgba(101, 142, 166, 0.22);
+    border-bottom: 1px solid rgba(101, 142, 166, 0.16);
+    clip-path: none;
+  }
+
+  html:not([data-contrast="high"]) .vector-match-shape {
+    width: 202px;
+    height: 202px;
+  }
+
+  /* Rule Shift gives the signal more authority than its answer controls. */
+  html:not([data-contrast="high"]) .rule-shift-field {
+    height: 246px;
+    margin-inline: auto;
+  }
+
+  html:not([data-contrast="high"]) .rule-shift-signal {
+    width: 204px;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-position-left
+    .rule-shift-signal {
+    right: auto;
+    left: 9%;
+  }
+
+  html:not([data-contrast="high"])
+    .signal-position-right
+    .rule-shift-signal {
+    right: 9%;
+    left: auto;
+  }
+
+  html:not([data-contrast="high"]) .rule-shift-actions {
+    width: min(680px, 100%);
+    margin-inline: auto;
+  }
+
+  html:not([data-contrast="high"]) .trace-pair-radial {
+    stroke: rgba(104, 146, 171, 0.42);
+    stroke-width: 0.46px;
+  }
+}
+
+@media (min-width: 721px) {
+  html[data-theme="light"]:not([data-contrast="high"])
+    .signal-sweep-option:not(:disabled):hover,
+  html[data-theme="light"]:not([data-contrast="high"])
+    .signal-sweep-option:focus-visible {
+    border-color: rgba(135, 103, 39, 0.7);
+    background: rgba(83, 112, 128, 0.1);
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .signal-sweep-count-stepper {
+    border: 0;
+    background: transparent;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .signal-sweep-count-stepper
+    > button {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .signal-sweep-count-stepper
+    output {
+    border: 0;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"]) .vector-match-panel {
+    border: 0;
+    background: transparent;
+  }
+
+  html[data-theme="light"]:not([data-contrast="high"])
+    .trace-pair-radial {
+    stroke: rgba(67, 104, 127, 0.48);
+    stroke-width: 0.5px;
+  }
 }

@@ -178,6 +178,7 @@ export function NumberMemory({
   }
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     flushSync(() => {
       setSeed(createSeed());
       setRoundIndex(0);

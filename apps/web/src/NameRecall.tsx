@@ -161,6 +161,7 @@ export function NameRecall({
   }, [onComplete, phase, roundIndex]);
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     setSeed(createSeed());
     setRoundIndex(0);
     setSelectedName(null);
@@ -350,19 +351,23 @@ export function NameRecall({
             />
           </div>
         </div>
-        <PaceBonusTimer
-          active={phase === "recall"}
-          earned={
-            phase === "feedback"
-              ? Boolean(
-                  currentCorrect &&
-                    currentResponseMs !== null &&
-                    currentResponseMs <= PACE_BONUS_WINDOW_MS,
-                )
-              : null
-          }
-          resetKey={roundIndex}
-        />
+        {phase === "study" || phase === "hold" ? (
+          <span className="pace-bonus-spacer" aria-hidden="true" />
+        ) : (
+          <PaceBonusTimer
+            active={phase === "recall"}
+            earned={
+              phase === "feedback"
+                ? Boolean(
+                    currentCorrect &&
+                      currentResponseMs !== null &&
+                      currentResponseMs <= PACE_BONUS_WINDOW_MS,
+                  )
+                : null
+            }
+            resetKey={roundIndex}
+          />
+        )}
       </div>
 
       <div className="name-recall-card">

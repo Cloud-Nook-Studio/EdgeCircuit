@@ -102,6 +102,7 @@ export function RuleShift({
   }, [onComplete, phase, roundIndex]);
 
   function startSession() {
+    window.scrollTo({ top: 0, behavior: "auto" });
     setSeed(createSeed());
     setRoundIndex(0);
     setResults([]);
